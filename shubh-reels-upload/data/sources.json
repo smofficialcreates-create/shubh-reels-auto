@@ -1,0 +1,15 @@
+{
+  "note": "Free, keyless sources used to find what is current. Edit freely; a feed that fails is skipped.",
+  "hn": ["https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=40"],
+  "feeds": [
+    ["TechCrunch", "https://techcrunch.com/category/artificial-intelligence/feed/"],
+    ["The Verge", "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"],
+    ["MIT Technology Review", "https://www.technologyreview.com/feed/"],
+    ["Ars Technica", "https://feeds.arstechnica.com/arstechnica/technology-lab"],
+    ["Lifehacker", "https://lifehacker.com/feed/rss"],
+    ["Zapier", "https://zapier.com/blog/feeds/latest/"]
+  ],
+  "skip_hosts": ["twitter.com", "x.com", "youtube.com", "youtu.be", "reddit.com", "facebook.com", "instagram.com",
+                 "linkedin.com", "tiktok.com", "github.com", "arxiv.org", "news.ycombinator.com"],
+  "max_age_days": 10
+}

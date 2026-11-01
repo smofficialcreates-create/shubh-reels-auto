@@ -1,0 +1,3 @@
+vendor/ig_skill/ is from github.com/Jakeschincariol/instagram-agent-skill (MIT, see vendor/ig_skill/LICENSE).
+assets/character.jpg is user-supplied artwork; its ownership has not been verified. assets/character_clean.png
+is the same image with the cigarette and smoke removed (reelbot/prep_character.py).
