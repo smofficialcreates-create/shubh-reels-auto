@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "date": "2026-11-01",
+    "topic": "AI overhead in JS frameworks",
+    "category": "practical_ai_tutorials",
+    "hook": "Want to stop AI waste on your web stack?",
+    "source_url": "https://nolanlawson.com/2026/10/28/the-ai-cost-of-javascript-frameworks/",
+    "mode": "source",
+    "quality": 92,
+    "media_id": "18141631546621118"
+  }
+]
