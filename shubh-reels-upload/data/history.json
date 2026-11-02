@@ -8,5 +8,15 @@
     "mode": "source",
     "quality": 92,
     "media_id": "18141631546621118"
+  },
+  {
+    "date": "2026-11-02",
+    "topic": "Clear AI Prompts",
+    "category": "ai_discoveries",
+    "hook": "What if your prompts could cut work in half?",
+    "source_url": null,
+    "mode": "evergreen",
+    "quality": 82,
+    "media_id": "18125062442293586"
   }
 ]
