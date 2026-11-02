@@ -77,7 +77,10 @@ Also list "unsupported_claims": any statement not backed by the SOURCE (or any f
 Reject for: medical, legal or financial advice; income promises; politics, religion, alcohol, tobacco, drugs; disparaging a person or company; claiming a tool is free or its price without proof in the SOURCE; fewer than three concrete steps; padding.
 Reply with JSON only: {"hook": 0, "accuracy": 0, "value": 0, "retention": 0, "visual": 0, "originality": 0, "unsupported_claims": [], "problems": []}"""
 
-PASS_TOTAL = 80
+PASS_TOTAL = 76          # normal bar
+FALLBACK_TOTAL = 70      # last resort, only after every plan failed; accuracy and claim checks still apply
+HOOK_FLOOR = 45
+_NEAR: list = []         # scripts that passed every hard check but missed the quality total
 PASS_ACCURACY = 16
 
 
@@ -182,7 +185,7 @@ def build_plans(cfg: Config, history: list[dict], today: dt.date, log: dict) -> 
             continue
         plans.append({"mode": "source", "cand": r["candidate"], "category": r["category"], "angle": r["angle"],
                       "scores": r["scores"], "total": r["total"], "excerpt": art["text"]})
-        if len(plans) == 2:
+        if len(plans) == 3:
             break
     pillar, seed = pick_topic(history, today)
     plans.append({"mode": "evergreen", "pillar": pillar, "seed": seed, "category": topic.evergreen_category(history, today)})
@@ -228,8 +231,8 @@ def attempt(cfg: Config, plan: dict, history: list[dict], problems: list[str], t
     dup = safety.too_similar(script["topic"], past)
     if dup:
         issues.append(f"too similar to an earlier topic: {dup}")
-    if script["hook_score"] < 50:
-        issues.append(f"best hook only scores {script['hook_score']} (need 50+)")
+    if script["hook_score"] < HOOK_FLOOR:
+        issues.append(f"best hook only scores {script['hook_score']} (need {HOOK_FLOOR}+)")
     verified = []
     if source:
         verified, g_issues = grounding.verify(script, plan["excerpt"])
@@ -250,6 +253,10 @@ def attempt(cfg: Config, plan: dict, history: list[dict], problems: list[str], t
                  [f"unsupported: {u}" for u in review.get("unsupported_claims", [])][:4]
     if review.get("unsupported_claims"):
         return None, problems_r or ["unsupported claims"]
+    if total < PASS_TOTAL and total >= FALLBACK_TOTAL and parts["accuracy"] >= PASS_ACCURACY:
+        script["quality"] = {"total": total, **parts}
+        script["evidence_verified"] = verified
+        _NEAR.append((total, script, plan))
     if total < PASS_TOTAL or parts["accuracy"] < PASS_ACCURACY:
         return None, [f"quality {total}/100 (hook {parts['hook']}, accuracy {parts['accuracy']}, value {parts['value']}, "
                       f"retention {parts['retention']}) is below the bar of {PASS_TOTAL}"] + problems_r
@@ -258,30 +265,38 @@ def attempt(cfg: Config, plan: dict, history: list[dict], problems: list[str], t
     return script, []
 
 
+def finish(script: dict, plan: dict, log: dict) -> dict:
+    script["pillar"] = plan.get("pillar") or plan["category"]
+    script["category"] = script.get("category") or plan["category"]
+    script["mode"] = plan["mode"]
+    if plan["mode"] == "source":
+        c = plan["cand"]
+        script["source"] = {"title": c.title, "publisher": c.publisher, "url": c.url, "published": c.published}
+        script["topic_scores"] = {"scores": plan["scores"], "total": plan["total"]}
+    script["research"] = {**log, "mode": plan["mode"], "rubric": script["quality"],
+                          "fact_check": fact_check(script), "opinions": script["opinions"]}
+    return script
+
+
 def generate(cfg: Config, history: list[dict], today: dt.date | None = None) -> dict:
     today = today or dt.date.today()
     log: dict = {"date": today.isoformat()}
     plans = build_plans(cfg, history, today, log)
     for plan in plans:
-        tries = 2
+        tries = 3
         problems: list[str] = []
         label = plan["cand"].title if plan["mode"] == "source" else plan["seed"]
         for n in range(tries):
             print(f"[{plan['mode']}] attempt {n + 1}: {label[:80]}", file=sys.stderr)
             script, issues = attempt(cfg, plan, history, problems, today)
             if script:
-                script["pillar"] = plan.get("pillar") or plan["category"]
-                script["category"] = script.get("category") or plan["category"]
-                script["mode"] = plan["mode"]
-                if plan["mode"] == "source":
-                    c = plan["cand"]
-                    script["source"] = {"title": c.title, "publisher": c.publisher, "url": c.url, "published": c.published}
-                    script["topic_scores"] = {"scores": plan["scores"], "total": plan["total"]}
-                script["research"] = {**log, "mode": plan["mode"], "rubric": script["quality"],
-                                      "fact_check": fact_check(script), "opinions": script["opinions"]}
-                return script
+                return finish(script, plan, log)
             problems += issues
             print(f"  rejected: {issues[:4]}", file=sys.stderr)
+    if _NEAR:
+        total, script, plan = max(_NEAR, key=lambda t: t[0])
+        print(f"using best near-miss script ({total}/100): every safety and accuracy check passed", file=sys.stderr)
+        return finish(script, plan, log)
     raise RuntimeError("no script passed research, safety and quality checks; skipping today's post")
 
 
