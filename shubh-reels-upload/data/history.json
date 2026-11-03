@@ -18,5 +18,15 @@
     "mode": "evergreen",
     "quality": 82,
     "media_id": "18125062442293586"
+  },
+  {
+    "date": "2026-11-03",
+    "topic": "Watch\u2011Powered Conversation Capture",
+    "category": "productivity_methods",
+    "hook": "Missed a key point? Your watch can rewind it",
+    "source_url": "https://techcrunch.com/2026/11/02/apple-watchs-ai-features-for-rewinding-and-recapping-conversations-begin-beta-testing/",
+    "mode": "source",
+    "quality": 88,
+    "media_id": "18230128489335520"
   }
 ]
