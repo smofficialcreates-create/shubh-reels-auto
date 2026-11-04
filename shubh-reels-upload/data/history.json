@@ -28,5 +28,15 @@
     "mode": "source",
     "quality": 88,
     "media_id": "18230128489335520"
+  },
+  {
+    "date": "2026-11-04",
+    "topic": "Enabling Siri AI Actions Across Third-Party iOS Apps",
+    "category": "underrated_tools",
+    "hook": "You are using Siri the wrong way.",
+    "source_url": "https://www.theverge.com/tech/1025694/apple-siri-ai-third-party-apps",
+    "mode": "source",
+    "quality": 77,
+    "media_id": "18643890775007745"
   }
 ]
