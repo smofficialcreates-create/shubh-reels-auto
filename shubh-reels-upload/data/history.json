@@ -38,5 +38,15 @@
     "mode": "source",
     "quality": 77,
     "media_id": "18643890775007745"
+  },
+  {
+    "date": "2026-11-04",
+    "topic": "The Five Whys: Finding the Root Cause",
+    "category": "step_by_step_workflows",
+    "hook": "Nobody tells you why the first why misleads.",
+    "source_url": null,
+    "mode": "explainer",
+    "quality": 82,
+    "media_id": "17922737742457497"
   }
 ]
