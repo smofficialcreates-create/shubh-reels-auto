@@ -58,6 +58,27 @@ def push_media(cfg: Config, video_path: str, cover_path: str | None = None, bran
     return urls
 
 
+IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
+
+
+def wait_until(hhmm: str, lead_min: int = 3, max_wait_min: int = 90) -> None:
+    """Sleep until hh:mm India time (minus a few minutes for upload and processing), but only when
+    that moment is less than max_wait_min away. Past it, or far in the future, post at once."""
+    try:
+        h, m = (int(x) for x in hhmm.strip().split(":"))
+    except ValueError:
+        print(f"POST_AT_IST '{hhmm}' is not hh:mm; posting now")
+        return
+    now = dt.datetime.now(IST)
+    target = now.replace(hour=h, minute=m, second=0, microsecond=0) - dt.timedelta(minutes=lead_min)
+    wait = (target - now).total_seconds()
+    if 0 < wait <= max_wait_min * 60:
+        print(f"waiting {wait / 60:.0f} min to post at {hhmm} IST", flush=True)
+        time.sleep(wait)
+    else:
+        print(f"not waiting (target {hhmm} IST is {wait / 60:.0f} min away); posting now")
+
+
 def _graph(cfg: Config, path: str) -> str:
     return f"https://{cfg.graph_host}/{cfg.graph_version}/{path}"
 

@@ -39,14 +39,14 @@ def check_text(label: str, text: str, grounded: bool = False) -> list[str]:
 def check_script(script: dict, grounded: bool = False) -> list[str]:
     issues = []
     body = script.get("sentences", [])
-    if not (5 <= len(body) <= 10):
-        issues.append(f"body has {len(body)} sentences (need 5-10)")
+    if not (5 <= len(body) <= 18):
+        issues.append(f"body has {len(body)} sentences (need 5-18)")
     spoken = [script.get("hook", "")] + list(body) + [script.get("cta", "")]
     words = sum(len(s.split()) for s in spoken)
-    if not (50 <= words <= 95):
-        issues.append(f"{words} spoken words (need 50-95)")
+    if not (50 <= words <= 230):
+        issues.append(f"{words} spoken words (need 50-230)")
     for i, s in enumerate(spoken):
-        if len(s.split()) > 24:
+        if len(s.split()) > 26:
             issues.append(f"sentence {i} is {len(s.split())} words, too long to say well")
         issues += check_text(f"sentence {i}", s, grounded)
         if re.search(r"\d", s):

@@ -47,8 +47,16 @@ def main(argv=None) -> int:
     nar = tts.synth_fake(texts) if args.fake_tts else tts.synth_voice(texts, cfg.voice, cfg.speed, cfg.model_dir)
     total = len(nar.audio) / nar.sr
     print(f"voice: {total:.1f}s")
-    if total > 85:
-        print("::error::narration longer than 85s; Instagram reels allow 90s. Skipping.")
+    if total > 85 and not args.sample:
+        print(f"narration is {total:.0f}s, longer than 85s; switching to a backup lesson so today still posts")
+        script = script_gen.backup_script(history, dt.date.today())
+        json.dump(script, open(os.path.join(args.out_dir, "script.json"), "w"), indent=2)
+        texts = brand.spoken(script)
+        nar = tts.synth_fake(texts) if args.fake_tts else tts.synth_voice(texts, cfg.voice, cfg.speed, cfg.model_dir)
+        total = len(nar.audio) / nar.sr
+        print(f"voice: {total:.1f}s")
+    if total > 88:
+        print("::error::narration longer than 88s; Instagram reels allow 90s. Skipping.")
         return 1
 
     stage = Mascot(cfg.character)
@@ -69,6 +77,8 @@ def main(argv=None) -> int:
         print(f"not posting: {why}. The video is in {args.out_dir}/ (also uploaded as a workflow artifact).")
         return 0
 
+    if cfg.post_at:
+        publish.wait_until(cfg.post_at)
     urls = publish.push_media(cfg, video, cover_path)
     result = publish.publish_reel(cfg, urls["video"], caption, urls["cover"])
     print("published:", result)

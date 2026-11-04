@@ -1,0 +1,1629 @@
+[
+ {
+  "topic": "How an AI assistant actually answers you",
+  "pillar": "practical_ai_tutorials",
+  "category": "practical_ai_tutorials",
+  "tag": "AI EXPLAINED",
+  "hook": "You are using AI the wrong way.",
+  "hook_focus": "wrong",
+  "sentences": [
+   "It is a very well read autocomplete, and that changes how you should use it.",
+   "Picture a librarian who has read almost everything but answers from memory, never from a shelf.",
+   "First, your message is cut into small pieces called tokens.",
+   "A token is often a whole word, or just part of one.",
+   "Second, the assistant looks at everything in the chat at once, not only your last line.",
+   "That window of text is its desk, and the desk has a limit.",
+   "Third, it predicts the most likely next token.",
+   "It adds that token to the pile and predicts again.",
+   "It repeats this until the reply is done, and the words stream to you.",
+   "Type, the capital of France is, and the likely next token is Paris.",
+   "Nothing in that process checks a fact.",
+   "So the catch is this: it sounds just as sure when it is wrong.",
+   "Treat answers as a strong first draft, and check anything that matters.",
+   "Give it your goal, your context and the format you want, and the draft gets much closer.",
+   "Remember the three steps: pieces, desk, prediction."
+  ],
+  "scenes": [
+   {
+    "from": 1,
+    "to": 2,
+    "label": "the idea",
+    "visual": {
+     "type": "definition",
+     "term": "Autocomplete",
+     "meaning": "A system that guesses the next word from everything it has read."
+    }
+   },
+   {
+    "from": 3,
+    "to": 4,
+    "label": "step one",
+    "visual": {
+     "type": "numeral",
+     "n": 1,
+     "total": 3,
+     "title": "Cut into tokens"
+    }
+   },
+   {
+    "from": 5,
+    "to": 6,
+    "label": "step two",
+    "visual": {
+     "type": "compare",
+     "left": {
+      "title": "Off the desk",
+      "rows": [
+       "Oldest messages",
+       "Early instructions",
+       "Long old files"
+      ]
+     },
+     "right": {
+      "title": "On the desk",
+      "rows": [
+       "Your latest message",
+       "Recent chat",
+       "Pasted notes"
+      ]
+     }
+    }
+   },
+   {
+    "from": 7,
+    "to": 9,
+    "label": "step three",
+    "visual": {
+     "type": "flow",
+     "nodes": [
+      "Guess next token",
+      "Add it to the pile",
+      "Repeat, then stream"
+     ],
+     "sync": [
+      7,
+      8,
+      9
+     ]
+    }
+   },
+   {
+    "from": 10,
+    "to": 10,
+    "label": "an example",
+    "visual": {
+     "type": "chat",
+     "prompt": "The capital of France is",
+     "result": "Paris."
+    }
+   },
+   {
+    "from": 11,
+    "to": 12,
+    "label": "the catch",
+    "visual": {
+     "type": "compare",
+     "left": {
+      "title": "Trusting it",
+      "rows": [
+       "Sounds so sure",
+       "Nothing checks facts",
+       "Errors slip through"
+      ]
+     },
+     "right": {
+      "title": "Checking it",
+      "rows": [
+       "Treat it as a draft",
+       "Verify key facts",
+       "Safe to use"
+      ]
+     }
+    }
+   },
+   {
+    "from": 13,
+    "to": 14,
+    "label": "what to do",
+    "visual": {
+     "type": "checklist",
+     "labels": [
+      "Your goal",
+      "Your context",
+      "The format"
+     ]
+    }
+   },
+   {
+    "from": 15,
+    "to": 15,
+    "label": "the recap",
+    "visual": {
+     "type": "flow",
+     "nodes": [
+      "Tokens",
+      "The desk",
+      "Prediction"
+     ]
+    }
+   }
+  ],
+  "takeaway": "Treat an AI answer as a first draft and give it a goal, context and format.",
+  "emphasis": [
+   "wrong",
+   "autocomplete",
+   "memory",
+   "tokens",
+   "part",
+   "everything",
+   "limit",
+   "predicts",
+   "pile",
+   "stream",
+   "Paris",
+   "checks",
+   "wrong",
+   "draft",
+   "context",
+   "prediction",
+   "prompt"
+  ],
+  "cover_text": "You are using AI the wrong way",
+  "key_points": [],
+  "demo": null,
+  "cta_type": "save",
+  "cta": "Save this, and test it on your next prompt.",
+  "caption": "You are using AI the wrong way.\nIt predicts the next token, so check what matters.\nai assistant, tokens, context window, prompting\nAI-generated video.",
+  "hashtags": [
+   "#aitools",
+   "#prompting",
+   "#productivity"
+  ],
+  "hook_score": 45.0,
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "key_points": [],
+  "demo": null,
+  "opinions": [],
+  "evidence": [],
+  "cta_type": "save",
+  "pillar": "productivity_methods",
+  "topic": "Time blocking and where it breaks",
+  "category": "productivity_methods",
+  "tag": "TIME BLOCKING",
+  "hook": "You are planning your day the wrong way.",
+  "hook_focus": "wrong",
+  "sentences": [
+   "Time blocking means booking meetings with yourself.",
+   "Think of your day as a train timetable instead of a wish list.",
+   "First, list the few tasks that actually matter this week.",
+   "Next, give each one a block on your calendar, with a start and an end.",
+   "Say you have a report to write, so it gets a ninety minute block and nothing else.",
+   "Third, protect the block the way you would protect a meeting with your manager.",
+   "Close the chat, silence your phone and treat the end time as a real deadline.",
+   "Now the catch: a timetable with no gaps breaks at the first delay.",
+   "One late meeting pushes every block after it, and the whole day slides.",
+   "So leave a spare block each afternoon for the surprises.",
+   "Plan fewer blocks than you think you need, then move the rest to tomorrow.",
+   "Remember it like this: pick, block, protect, and leave room."
+  ],
+  "scenes": [
+   {
+    "from": 1,
+    "to": 2,
+    "label": "the idea",
+    "visual": {
+     "type": "definition",
+     "term": "Time blocking",
+     "meaning": "Giving each task its own slot on your calendar."
+    }
+   },
+   {
+    "from": 3,
+    "to": 5,
+    "label": "the method",
+    "visual": {
+     "type": "flow",
+     "nodes": [
+      "List what matters",
+      "Give each a block",
+      "Say, a report gets ninety minutes"
+     ],
+     "sync": [
+      3,
+      4,
+      5
+     ]
+    }
+   },
+   {
+    "from": 6,
+    "to": 7,
+    "label": "protect it",
+    "visual": {
+     "type": "compare",
+     "left": {
+      "title": "Unprotected",
+      "rows": [
+       "Chats pop in",
+       "Phone buzzes",
+       "Block shrinks"
+      ]
+     },
+     "right": {
+      "title": "Protected",
+      "rows": [
+       "Chat closed",
+       "Phone silent",
+       "Block holds"
+      ]
+     }
+    }
+   },
+   {
+    "from": 8,
+    "to": 9,
+    "label": "the catch",
+    "visual": {
+     "type": "layers",
+     "labels": [
+      "Block four",
+      "Block three",
+      "Block two",
+      "Late meeting"
+     ],
+     "sync": [
+      8,
+      8,
+      9,
+      9
+     ]
+    }
+   },
+   {
+    "from": 10,
+    "to": 11,
+    "label": "the fix",
+    "visual": {
+     "type": "numeral",
+     "n": 1,
+     "total": 1,
+     "title": "Leave a spare block"
+    }
+   },
+   {
+    "from": 12,
+    "to": 12,
+    "label": "the recap",
+    "visual": {
+     "type": "checklist",
+     "labels": [
+      "Pick",
+      "Block",
+      "Protect",
+      "Leave room"
+     ]
+    }
+   }
+  ],
+  "emphasis": [
+   "wrong",
+   "blocking",
+   "timetable",
+   "actually",
+   "calendar",
+   "nothing",
+   "protect",
+   "deadline",
+   "timetable",
+   "meeting",
+   "afternoon",
+   "tomorrow",
+   "remember",
+   "tomorrow"
+  ],
+  "cover_text": "You plan your day the wrong way",
+  "cta": "Save this, and block one hour tomorrow.",
+  "caption": "You are planning your day the wrong way.\nGive each task a block, protect it and leave room.\ntime blocking, calendar, focus, planning\nAI-generated video.",
+  "hashtags": [
+   "#productivity",
+   "#timeblocking",
+   "#focus"
+  ],
+  "hook_score": 45.0,
+  "takeaway": "You plan your day the wrong way."
+ },
+ {
+  "key_points": [],
+  "demo": null,
+  "opinions": [],
+  "evidence": [],
+  "cta_type": "send",
+  "pillar": "career_skills",
+  "topic": "The STAR method for interview answers",
+  "category": "career_skills",
+  "tag": "INTERVIEWS",
+  "hook": "Your interview answers are missing one thing.",
+  "hook_focus": "missing",
+  "sentences": [
+   "They tell what you did but never what changed.",
+   "The STAR method fixes that, and it works like telling the story of one project.",
+   "S is the situation, so set the scene in a sentence or two.",
+   "Say you were on a team that kept missing its weekly report.",
+   "T is the task, which means what you were responsible for.",
+   "A is the action, and this is the part to spend your time on.",
+   "Explain what you did and why you chose it, not what the team did.",
+   "R is the result, and this is where most people stop too early.",
+   "Say what changed, like reports going out on time every week.",
+   "Here is the catch: an answer that is all action and no result sounds busy, not effective.",
+   "Practise one story for each skill the job asks for.",
+   "Keep each one under two minutes, and say it out loud before the day.",
+   "Remember it like a short film: scene, job, move, outcome."
+  ],
+  "scenes": [
+   {
+    "from": 1,
+    "to": 2,
+    "label": "the problem",
+    "visual": {
+     "type": "compare",
+     "left": {
+      "title": "Common answer",
+      "rows": [
+       "Lists tasks",
+       "No outcome",
+       "Forgettable"
+      ]
+     },
+     "right": {
+      "title": "STAR answer",
+      "rows": [
+       "One clear story",
+       "Shows the result",
+       "Memorable"
+      ]
+     }
+    }
+   },
+   {
+    "from": 3,
+    "to": 4,
+    "label": "S for situation",
+    "visual": {
+     "type": "numeral",
+     "n": 1,
+     "total": 4,
+     "title": "Situation"
+    }
+   },
+   {
+    "from": 5,
+    "to": 5,
+    "label": "T for task",
+    "visual": {
+     "type": "definition",
+     "term": "Task",
+     "meaning": "What you were responsible for in that moment."
+    }
+   },
+   {
+    "from": 6,
+    "to": 7,
+    "label": "A for action",
+    "visual": {
+     "type": "keyword",
+     "word": "action"
+    }
+   },
+   {
+    "from": 8,
+    "to": 9,
+    "label": "R for result",
+    "visual": {
+     "type": "flow",
+     "nodes": [
+      "Say what changed",
+      "Make it concrete",
+      "Reports on time"
+     ],
+     "sync": [
+      8,
+      8,
+      9
+     ]
+    }
+   },
+   {
+    "from": 10,
+    "to": 10,
+    "label": "the catch",
+    "visual": {
+     "type": "compare",
+     "left": {
+      "title": "All action",
+      "rows": [
+       "Sounds busy",
+       "No proof",
+       "Hard to recall"
+      ]
+     },
+     "right": {
+      "title": "With a result",
+      "rows": [
+       "Sounds effective",
+       "Shows impact",
+       "Easy to recall"
+      ]
+     }
+    }
+   },
+   {
+    "from": 11,
+    "to": 13,
+    "label": "the practice",
+    "visual": {
+     "type": "checklist",
+     "labels": [
+      "One story per skill",
+      "Under two minutes",
+      "Say it out loud"
+     ]
+    }
+   }
+  ],
+  "emphasis": [
+   "missing",
+   "changed",
+   "telling",
+   "situation",
+   "missing",
+   "responsible",
+   "action",
+   "explain",
+   "result",
+   "changed",
+   "effective",
+   "practise",
+   "minutes",
+   "remember",
+   "interview"
+  ],
+  "cover_text": "Your interview answers miss this",
+  "cta": "Send this to someone with an interview coming up.",
+  "caption": "Your interview answers are missing one thing.\nSituation, task, action and result: tell one story with an outcome.\nstar method, interview tips, career skills\nAI-generated video.",
+  "hashtags": [
+   "#careertips",
+   "#interview",
+   "#starmethod"
+  ],
+  "hook_score": 28.2,
+  "takeaway": "Your interview answers miss this."
+ },
+ {
+  "topic": "Ask AI for the question behind your question",
+  "category": "practical_ai_tutorials",
+  "tag": "AI PROMPTS",
+  "hook": "Your AI answers are weak because your question is weak.",
+  "sentences": [
+   "Most people type a short wish and hope for magic.",
+   "Try this instead before you ask anything.",
+   "First, tell the assistant who you are and what you do.",
+   "Second, say what a good answer would help you decide.",
+   "Third, ask it to question you if something is unclear.",
+   "Suddenly the answers sound like they were written for you."
+  ],
+  "key_points": [
+   {
+    "sentence": 3,
+    "label": "Say who you are"
+   },
+   {
+    "sentence": 4,
+    "label": "State the decision"
+   },
+   {
+    "sentence": 5,
+    "label": "Let it ask back"
+   }
+  ],
+  "cta": "Save this and try it on your next prompt.",
+  "cover_text": "Fix your weak AI prompts",
+  "caption": "Weak question, weak answer. Give context, name the decision, invite questions.\nAI-generated video.",
+  "hashtags": [
+   "#aitools",
+   "#prompting",
+   "#productivity"
+  ],
+  "demo": {
+   "prompt": "I am a new analyst. Help me decide what to learn first. Ask me questions.",
+   "result": "Happy to help. What do you work on today, and what slows you down most?"
+  },
+  "hook_focus": "question",
+  "emphasis": [
+   "question",
+   "people",
+   "anything",
+   "assistant",
+   "second",
+   "something",
+   "suddenly",
+   "prompt"
+  ],
+  "takeaway": "Fix your weak AI prompts.",
+  "hook_score": 28.2,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Turn messy notes into a clear plan with AI",
+  "category": "step_by_step_workflows",
+  "tag": "WORKFLOW",
+  "hook": "Messy notes are costing you the first hour of your day.",
+  "sentences": [
+   "Here is a simple way to clean them up in minutes.",
+   "First, paste everything into your assistant without editing.",
+   "Second, ask it to group the notes by topic.",
+   "Third, ask for the three actions that move things forward.",
+   "Then close the notes and start the first action.",
+   "You trade an hour of sorting for a few minutes."
+  ],
+  "key_points": [
+   {
+    "sentence": 3,
+    "label": "Paste it all"
+   },
+   {
+    "sentence": 4,
+    "label": "Group by topic"
+   },
+   {
+    "sentence": 5,
+    "label": "Pick three actions"
+   }
+  ],
+  "cta": "Send this to someone who lives in messy notes.",
+  "cover_text": "Messy notes into a plan",
+  "caption": "Paste, group, pick three actions.\nAI-generated video.",
+  "hashtags": [
+   "#productivity",
+   "#aitools",
+   "#workflow"
+  ],
+  "demo": {
+   "prompt": "Group these notes by topic, then give me the three actions that matter most.",
+   "result": "Topics: client, launch, admin. Actions: send the draft, confirm the date, book the review."
+  },
+  "hook_focus": "costing",
+  "emphasis": [
+   "costing",
+   "minutes",
+   "everything",
+   "second",
+   "actions",
+   "action",
+   "sorting",
+   "someone"
+  ],
+  "takeaway": "Messy notes into a plan.",
+  "hook_score": 48.6,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "The two list method for deciding what to do first",
+  "category": "productivity_methods",
+  "tag": "FOCUS",
+  "hook": "Your to do list is not a plan, it is a pile.",
+  "sentences": [
+   "A pile feels busy but never tells you where to start.",
+   "Make two lists instead of one.",
+   "The first list holds what has a real deadline.",
+   "The second holds what would make next week easier.",
+   "Pick one item from the first list, then one from the second.",
+   "Everything else waits, and waiting is allowed."
+  ],
+  "key_points": [
+   {
+    "sentence": 3,
+    "label": "Deadline list"
+   },
+   {
+    "sentence": 4,
+    "label": "Future you list"
+   },
+   {
+    "sentence": 5,
+    "label": "Pick one from each"
+   }
+  ],
+  "cta": "Save this for your next messy Monday.",
+  "cover_text": "Your list is a pile",
+  "caption": "Two lists, two picks, one calm day.\nAI-generated video.",
+  "hashtags": [
+   "#productivity",
+   "#focus",
+   "#timemanagement"
+  ],
+  "demo": null,
+  "hook_focus": "your",
+  "emphasis": [
+   "your",
+   "feels",
+   "instead",
+   "deadline",
+   "second",
+   "second",
+   "everything",
+   "monday"
+  ],
+  "takeaway": "Your list is a pile.",
+  "hook_score": 45.0,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Use AI to rehearse a hard conversation",
+  "category": "career_skills",
+  "tag": "CAREER",
+  "hook": "Dreading a talk with your manager? Rehearse it first.",
+  "sentences": [
+   "Ask your assistant to play your manager.",
+   "Tell it the situation in two or three plain sentences.",
+   "Say your opening line out loud, then type it.",
+   "Let it push back the way a busy person might.",
+   "Try again until your first sentence feels calm and clear.",
+   "Walking in prepared changes how you sound."
+  ],
+  "key_points": [
+   {
+    "sentence": 1,
+    "label": "Cast the AI"
+   },
+   {
+    "sentence": 4,
+    "label": "Take the pushback"
+   },
+   {
+    "sentence": 5,
+    "label": "Repeat until calm"
+   }
+  ],
+  "cta": "Save this before your next big conversation.",
+  "cover_text": "Rehearse the hard talk",
+  "caption": "Practice with AI before the real conversation.\nAI-generated video.",
+  "hashtags": [
+   "#careertips",
+   "#aitools",
+   "#communication"
+  ],
+  "demo": {
+   "prompt": "Play my manager. I want to ask for a project change. Push back politely.",
+   "result": "Understood. Tell me why this change matters now and what you need from me."
+  },
+  "hook_focus": "dreading",
+  "emphasis": [
+   "dreading",
+   "assistant",
+   "situation",
+   "opening",
+   "person",
+   "sentence",
+   "prepared",
+   "conversation"
+  ],
+  "takeaway": "Rehearse the hard talk.",
+  "hook_score": 62.2,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Write a resume line with the action, the change and the proof",
+  "category": "career_skills",
+  "tag": "RESUME",
+  "hook": "Most resume lines describe a job instead of a result.",
+  "sentences": [
+   "Fix yours with a simple three part line.",
+   "Start with the action you took.",
+   "Add what changed because of it.",
+   "End with proof, a number you can honestly stand behind.",
+   "Then ask your assistant to tighten the wording, not the facts.",
+   "Recruiters skim, so make every line earn its space."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "Action"
+   },
+   {
+    "sentence": 3,
+    "label": "What changed"
+   },
+   {
+    "sentence": 4,
+    "label": "Honest proof"
+   }
+  ],
+  "cta": "Save this and fix three lines tonight.",
+  "cover_text": "Fix your resume lines",
+  "caption": "Action, change, proof. Keep it true.\nAI-generated video.",
+  "hashtags": [
+   "#careertips",
+   "#resume",
+   "#jobsearch"
+  ],
+  "demo": null,
+  "hook_focus": "describe",
+  "emphasis": [
+   "describe",
+   "simple",
+   "action",
+   "changed",
+   "honestly",
+   "assistant",
+   "recruiters",
+   "tonight"
+  ],
+  "takeaway": "Fix your resume lines.",
+  "hook_score": 40.8,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "The five minute start rule",
+  "category": "psychology_learning",
+  "tag": "HABITS",
+  "hook": "You do not lack discipline, you lack a tiny start.",
+  "sentences": [
+   "Big tasks feel heavy before you even touch them.",
+   "So shrink the first step until it feels silly.",
+   "Set a timer for five minutes and promise only to begin.",
+   "Open the file, write one line, or list one question.",
+   "Most of the time you will keep going without forcing it.",
+   "And if you stop, you still moved forward."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "Shrink the step"
+   },
+   {
+    "sentence": 3,
+    "label": "Five minute timer"
+   },
+   {
+    "sentence": 4,
+    "label": "Just begin"
+   }
+  ],
+  "cta": "Send this to a friend who keeps delaying.",
+  "cover_text": "Beat the heavy start",
+  "caption": "Make the first step tiny.\nAI-generated video.",
+  "hashtags": [
+   "#productivity",
+   "#habits",
+   "#focus"
+  ],
+  "demo": null,
+  "hook_focus": "discipline",
+  "emphasis": [
+   "discipline",
+   "before",
+   "shrink",
+   "minutes",
+   "question",
+   "without",
+   "forward",
+   "delaying"
+  ],
+  "takeaway": "Beat the heavy start.",
+  "hook_score": 48.6,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Summarize a long article with questions, not just a summary",
+  "category": "practical_ai_tutorials",
+  "tag": "AI READING",
+  "hook": "A summary tells you what it says, not what matters to you.",
+  "sentences": [
+   "Try asking better questions about anything you read.",
+   "First, paste the text and say why you are reading it.",
+   "Second, ask what would change your mind or your plan.",
+   "Third, ask for the weakest point in the argument.",
+   "Now you read with a purpose instead of a hurry.",
+   "Always check important facts in the original."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "State your purpose"
+   },
+   {
+    "sentence": 3,
+    "label": "Ask what matters"
+   },
+   {
+    "sentence": 4,
+    "label": "Find the weak point"
+   }
+  ],
+  "cta": "Save this for your next long read.",
+  "cover_text": "Read smarter with AI",
+  "caption": "Purpose first, then questions, then verify.\nAI-generated video.",
+  "hashtags": [
+   "#aitools",
+   "#learning",
+   "#productivity"
+  ],
+  "demo": null,
+  "hook_focus": "summary",
+  "emphasis": [
+   "summary",
+   "questions",
+   "reading",
+   "second",
+   "argument",
+   "purpose",
+   "important",
+   null
+  ],
+  "takeaway": "Read smarter with AI.",
+  "hook_score": 45.0,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Build a weekly review in ten minutes",
+  "category": "productivity_methods",
+  "tag": "WEEKLY REVIEW",
+  "hook": "Ten minutes on Friday can save your whole next week.",
+  "sentences": [
+   "Here is a weekly review you can finish with a coffee.",
+   "First, list what went well, even small things.",
+   "Second, list what dragged and why.",
+   "Third, choose the one thing to change next week.",
+   "Write it where you will see it on Monday.",
+   "One change at a time actually sticks."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "What went well"
+   },
+   {
+    "sentence": 3,
+    "label": "What dragged"
+   },
+   {
+    "sentence": 4,
+    "label": "One change"
+   }
+  ],
+  "cta": "Save this for Friday afternoon.",
+  "cover_text": "The ten minute review",
+  "caption": "Wins, drags, one change.\nAI-generated video.",
+  "hashtags": [
+   "#productivity",
+   "#habits",
+   "#weeklyreview"
+  ],
+  "demo": null,
+  "hook_focus": "minutes",
+  "emphasis": [
+   "minutes",
+   "weekly",
+   "things",
+   "dragged",
+   "choose",
+   "monday",
+   "actually",
+   "afternoon"
+  ],
+  "takeaway": "The ten minute review.",
+  "hook_score": 58.4,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Learn a new skill by teaching it back",
+  "category": "psychology_learning",
+  "tag": "LEARNING",
+  "hook": "If you cannot explain it simply, you have not learned it yet.",
+  "sentences": [
+   "Here is a learning trick that takes a few minutes.",
+   "After you study something, explain it to an imaginary beginner.",
+   "Where you stumble is exactly what you have not understood.",
+   "Go back and fix only those gaps.",
+   "Then ask your assistant to quiz you on them.",
+   "Small gaps closed beat hours of rereading."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "Explain to a beginner"
+   },
+   {
+    "sentence": 3,
+    "label": "Spot the gaps"
+   },
+   {
+    "sentence": 5,
+    "label": "Get quizzed"
+   }
+  ],
+  "cta": "Save this for your next study session.",
+  "cover_text": "Learn by teaching back",
+  "caption": "Explain it simply to find the gaps.\nAI-generated video.",
+  "hashtags": [
+   "#learning",
+   "#studytips",
+   "#aitools"
+  ],
+  "demo": null,
+  "hook_focus": "explain",
+  "emphasis": [
+   "explain",
+   "learning",
+   "something",
+   "understood",
+   "those",
+   "assistant",
+   "rereading",
+   "session"
+  ],
+  "takeaway": "Learn by teaching back.",
+  "hook_score": 43.6,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Stop saying yes to everything at work",
+  "category": "career_skills",
+  "tag": "CAREER",
+  "hook": "Saying yes to everything makes you easy to ignore.",
+  "sentences": [
+   "Try this calm way to protect your time.",
+   "When a request lands, pause before you answer.",
+   "Ask what the deadline is and what it replaces.",
+   "Offer a smaller version or a later date.",
+   "People respect clear limits more than silent stress.",
+   "Your best work needs space."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "Pause first"
+   },
+   {
+    "sentence": 3,
+    "label": "Ask what it replaces"
+   },
+   {
+    "sentence": 4,
+    "label": "Offer a smaller yes"
+   }
+  ],
+  "cta": "Send this to a colleague who is overloaded.",
+  "cover_text": "Say no without drama",
+  "caption": "Pause, ask, offer a smaller yes.\nAI-generated video.",
+  "hashtags": [
+   "#careertips",
+   "#workplace",
+   "#boundaries"
+  ],
+  "demo": null,
+  "hook_focus": "everything",
+  "emphasis": [
+   "everything",
+   "protect",
+   "request",
+   "deadline",
+   "smaller",
+   "respect",
+   "needs",
+   "overloaded"
+  ],
+  "takeaway": "Say no without drama.",
+  "hook_score": 37.8,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Draft emails faster with a tone and goal prompt",
+  "category": "practical_ai_tutorials",
+  "tag": "AI EMAIL",
+  "hook": "Stop staring at a blank email for ten minutes.",
+  "sentences": [
+   "Give your assistant two things before it writes anything.",
+   "First, the goal, like getting a yes by Friday.",
+   "Second, the tone, like warm but direct.",
+   "Paste your rough points and ask for a short draft.",
+   "Read it out loud and fix anything that does not sound like you.",
+   "You still send it, so it stays yours."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "State the goal"
+   },
+   {
+    "sentence": 3,
+    "label": "Pick the tone"
+   },
+   {
+    "sentence": 5,
+    "label": "Edit in your voice"
+   }
+  ],
+  "cta": "Save this for your next tricky email.",
+  "cover_text": "Write emails in minutes",
+  "caption": "Goal, tone, rough points, then edit.\nAI-generated video.",
+  "hashtags": [
+   "#aitools",
+   "#productivity",
+   "#email"
+  ],
+  "demo": {
+   "prompt": "Goal: a yes by Friday. Tone: warm but direct. Draft a short reply from these points.",
+   "result": "Hi Sam, thanks for the update. Could you confirm by Friday so we can plan the next step?"
+  },
+  "hook_focus": "staring",
+  "emphasis": [
+   "staring",
+   "assistant",
+   "getting",
+   "second",
+   "points",
+   "anything",
+   "still",
+   "tricky"
+  ],
+  "takeaway": "Write emails in minutes.",
+  "hook_score": 80.2,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Single task for one hour beats juggling",
+  "category": "productivity_methods",
+  "tag": "FOCUS",
+  "hook": "Juggling five tasks is slower than doing one at a time.",
+  "sentences": [
+   "Switching tasks forces your mind to restart again and again.",
+   "Try one hour of a single task instead.",
+   "Silence your phone and close every other tab.",
+   "Write the finish line before you begin.",
+   "When the hour ends, take a real break.",
+   "You will notice how much quieter work feels."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "One task, one hour"
+   },
+   {
+    "sentence": 3,
+    "label": "Close the noise"
+   },
+   {
+    "sentence": 4,
+    "label": "Write the finish line"
+   }
+  ],
+  "cta": "Save this and try it tomorrow morning.",
+  "cover_text": "One hour, one task",
+  "caption": "Single task focus, one hour at a time.\nAI-generated video.",
+  "hashtags": [
+   "#productivity",
+   "#focus",
+   "#deepwork"
+  ],
+  "demo": null,
+  "hook_focus": "juggling",
+  "emphasis": [
+   "juggling",
+   "switching",
+   "instead",
+   "silence",
+   "finish",
+   "break",
+   "quieter",
+   "tomorrow"
+  ],
+  "takeaway": "One hour, one task.",
+  "hook_score": 47.6,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Use AI as a study partner, not an answer machine",
+  "category": "psychology_learning",
+  "tag": "AI STUDY",
+  "hook": "If AI gives you every answer, you are not learning.",
+  "sentences": [
+   "Flip the roles to keep your brain involved.",
+   "Ask it to quiz you instead of explaining.",
+   "Answer in your own words before you see its response.",
+   "Then ask where your answer was weak.",
+   "Finish by asking for one harder question.",
+   "That is practice, and practice is what builds skill."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "Get quizzed"
+   },
+   {
+    "sentence": 3,
+    "label": "Answer first"
+   },
+   {
+    "sentence": 5,
+    "label": "Level up"
+   }
+  ],
+  "cta": "Send this to someone who studies with AI.",
+  "cover_text": "Study with AI the right way",
+  "caption": "Quiz me, let me answer, then show the gap.\nAI-generated video.",
+  "hashtags": [
+   "#aitools",
+   "#studytips",
+   "#learning"
+  ],
+  "demo": null,
+  "hook_focus": "learning",
+  "emphasis": [
+   "learning",
+   "involved",
+   "explaining",
+   "response",
+   "answer",
+   "question",
+   "practice",
+   "someone"
+  ],
+  "takeaway": "Study with AI the right way.",
+  "hook_score": 45.0,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Prepare for an interview with a mock panel",
+  "category": "career_skills",
+  "tag": "INTERVIEW",
+  "hook": "Reading answers is not the same as saying them.",
+  "sentences": [
+   "Use your assistant as a friendly interview panel.",
+   "Paste the job description and your resume.",
+   "Ask for five likely questions for this exact role.",
+   "Answer out loud, then ask for feedback on clarity.",
+   "Tighten each answer to a story with a start and an end.",
+   "Confidence comes from reps, not hope."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "Paste the role"
+   },
+   {
+    "sentence": 3,
+    "label": "Likely questions"
+   },
+   {
+    "sentence": 5,
+    "label": "Tell short stories"
+   }
+  ],
+  "cta": "Save this before your next interview.",
+  "cover_text": "Mock interview with AI",
+  "caption": "Practice out loud with a mock panel.\nAI-generated video.",
+  "hashtags": [
+   "#careertips",
+   "#interview",
+   "#aitools"
+  ],
+  "demo": null,
+  "hook_focus": "reading",
+  "emphasis": [
+   "reading",
+   "assistant",
+   "description",
+   "questions",
+   "feedback",
+   "tighten",
+   "confidence",
+   "interview"
+  ],
+  "takeaway": "Mock interview with AI.",
+  "hook_score": 44.4,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "The myth that busy means productive",
+  "category": "myths_vs_reality",
+  "tag": "MYTH",
+  "hook": "Being busy all day does not mean you got anything done.",
+  "sentences": [
+   "Busy is motion, productive is progress.",
+   "Look at your day and find one thing that moved a goal forward.",
+   "If you cannot name it, the day was mostly noise.",
+   "Start tomorrow by choosing that one thing first.",
+   "Protect it before email and chats take over.",
+   "One real win beats ten small distractions."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "Find the real win"
+   },
+   {
+    "sentence": 4,
+    "label": "Choose it first"
+   },
+   {
+    "sentence": 5,
+    "label": "Protect it"
+   }
+  ],
+  "cta": "Save this and name tomorrow's win tonight.",
+  "cover_text": "Busy is not productive",
+  "caption": "Name one real win, protect it.\nAI-generated video.",
+  "hashtags": [
+   "#productivity",
+   "#mindset",
+   "#focus"
+  ],
+  "demo": null,
+  "hook_focus": "anything",
+  "emphasis": [
+   "anything",
+   "productive",
+   "forward",
+   "cannot",
+   "tomorrow",
+   "protect",
+   "distractions",
+   "tomorrows"
+  ],
+  "takeaway": "Busy is not productive.",
+  "hook_score": 48.6,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Make a checklist once, reuse it forever",
+  "category": "step_by_step_workflows",
+  "tag": "SYSTEMS",
+  "hook": "Doing the same task from memory is a slow way to work.",
+  "sentences": [
+   "Turn repeat tasks into a checklist once.",
+   "Next time you do the task, write each step as you go.",
+   "Ask your assistant to clean up the list and spot missing steps.",
+   "Save it somewhere you can find in seconds.",
+   "Now the task takes less thinking and fewer mistakes.",
+   "Build a few checklists and your week gets lighter."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "Write steps as you go"
+   },
+   {
+    "sentence": 3,
+    "label": "Let AI tidy it"
+   },
+   {
+    "sentence": 4,
+    "label": "Save it"
+   }
+  ],
+  "cta": "Send this to someone who repeats tasks daily.",
+  "cover_text": "Checklists that save time",
+  "caption": "Write it once, reuse it.\nAI-generated video.",
+  "hashtags": [
+   "#productivity",
+   "#workflow",
+   "#systems"
+  ],
+  "demo": null,
+  "hook_focus": "memory",
+  "emphasis": [
+   "memory",
+   "checklist",
+   "write",
+   "assistant",
+   "somewhere",
+   "thinking",
+   "checklists",
+   "someone"
+  ],
+  "takeaway": "Checklists that save time.",
+  "hook_score": 30.0,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Choose a skill to learn with the three question filter",
+  "category": "career_skills",
+  "tag": "SKILLS",
+  "hook": "Learning random skills is how people stay busy and stuck.",
+  "sentences": [
+   "Use three questions to choose what to learn next.",
+   "Will this help me in the work I want in a year?",
+   "Can I practice it on a real project this month?",
+   "Does someone I respect already use it?",
+   "If two answers are yes, start this week.",
+   "If not, let it go without guilt."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "Fits my path"
+   },
+   {
+    "sentence": 3,
+    "label": "Practice soon"
+   },
+   {
+    "sentence": 4,
+    "label": "People I respect"
+   }
+  ],
+  "cta": "Save this before you buy another course.",
+  "cover_text": "Pick the right skill",
+  "caption": "Three questions to choose what to learn.\nAI-generated video.",
+  "hashtags": [
+   "#careertips",
+   "#skills",
+   "#learning"
+  ],
+  "demo": null,
+  "hook_focus": "learning",
+  "emphasis": [
+   "learning",
+   "questions",
+   null,
+   "practice",
+   "someone",
+   "answers",
+   "without",
+   "another"
+  ],
+  "takeaway": "Pick the right skill.",
+  "hook_score": 30.0,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Check AI answers before you trust them",
+  "category": "myths_vs_reality",
+  "tag": "AI TRUTH",
+  "hook": "AI can sound confident and still be wrong.",
+  "sentences": [
+   "That is why a quick check matters.",
+   "First, ask it to show how it reached the answer.",
+   "Second, check one key detail in a source you trust.",
+   "Third, ask it to argue the opposite side.",
+   "If the answer survives, you can use it with more confidence.",
+   "Trust, but verify."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "Ask for reasoning"
+   },
+   {
+    "sentence": 3,
+    "label": "Check one detail"
+   },
+   {
+    "sentence": 4,
+    "label": "Argue the opposite"
+   }
+  ],
+  "cta": "Save this and send it to your team.",
+  "cover_text": "Do not trust AI blindly",
+  "caption": "Check reasoning, check a source, test the opposite.\nAI-generated video.",
+  "hashtags": [
+   "#aitools",
+   "#aisafety",
+   "#criticalthinking"
+  ],
+  "demo": null,
+  "hook_focus": "confident",
+  "emphasis": [
+   "confident",
+   "matters",
+   "reached",
+   "second",
+   "opposite",
+   "confidence",
+   "verify",
+   null
+  ],
+  "takeaway": "Do not trust AI blindly.",
+  "hook_score": 44.4,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Plan tomorrow tonight in three minutes",
+  "category": "productivity_methods",
+  "tag": "PLANNING",
+  "hook": "The best part of tomorrow can be decided tonight.",
+  "sentences": [
+   "It takes three minutes and removes morning confusion.",
+   "Write down the one thing that must happen tomorrow.",
+   "Add two smaller tasks that would feel good to finish.",
+   "Put the first step on your screen so it greets you.",
+   "Then close the day and actually rest.",
+   "You start already moving instead of deciding."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "One must do"
+   },
+   {
+    "sentence": 3,
+    "label": "Two small wins"
+   },
+   {
+    "sentence": 4,
+    "label": "Leave the first step out"
+   }
+  ],
+  "cta": "Save this for tonight.",
+  "cover_text": "Plan tomorrow tonight",
+  "caption": "One must do, two small wins, first step ready.\nAI-generated video.",
+  "hashtags": [
+   "#productivity",
+   "#planning",
+   "#routine"
+  ],
+  "demo": null,
+  "hook_focus": "tomorrow",
+  "emphasis": [
+   "tomorrow",
+   "confusion",
+   "tomorrow",
+   "smaller",
+   "screen",
+   "actually",
+   "deciding",
+   "tonight"
+  ],
+  "takeaway": "Plan tomorrow tonight.",
+  "hook_score": 30.0,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Network without feeling fake",
+  "category": "career_skills",
+  "tag": "NETWORKING",
+  "hook": "Networking feels fake only when you treat it as taking.",
+  "sentences": [
+   "Flip it into giving, and it gets easier.",
+   "Send a short note about something useful you found.",
+   "Say what you liked about their work, in one honest line.",
+   "Ask one specific question, not for a favor.",
+   "Follow up gently, then let the connection grow.",
+   "Real relationships are built slowly."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "Share something useful"
+   },
+   {
+    "sentence": 3,
+    "label": "Be honest and specific"
+   },
+   {
+    "sentence": 4,
+    "label": "Ask one question"
+   }
+  ],
+  "cta": "Send this to someone who dislikes networking.",
+  "cover_text": "Networking that feels real",
+  "caption": "Give first, be specific, follow up.\nAI-generated video.",
+  "hashtags": [
+   "#careertips",
+   "#networking",
+   "#growth"
+  ],
+  "demo": null,
+  "hook_focus": "networking",
+  "emphasis": [
+   "networking",
+   "giving",
+   "something",
+   "honest",
+   "specific",
+   "connection",
+   "relationships",
+   "networking"
+  ],
+  "takeaway": "Networking that feels real.",
+  "hook_score": 52.2,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ },
+ {
+  "topic": "Break a big goal into a three day sprint",
+  "category": "step_by_step_workflows",
+  "tag": "SPRINT",
+  "hook": "Big goals die because they have no next step.",
+  "sentences": [
+   "Cut yours into a three day sprint.",
+   "Day one, define the smallest useful version.",
+   "Day two, build or write the rough draft.",
+   "Day three, fix the biggest problem and share it.",
+   "Ask your assistant to turn your goal into those three days.",
+   "Done and shared beats perfect and hidden."
+  ],
+  "key_points": [
+   {
+    "sentence": 2,
+    "label": "Day one: define"
+   },
+   {
+    "sentence": 3,
+    "label": "Day two: draft"
+   },
+   {
+    "sentence": 4,
+    "label": "Day three: ship"
+   }
+  ],
+  "cta": "Save this for the goal you keep avoiding.",
+  "cover_text": "Three day sprint",
+  "caption": "Define, draft, ship.\nAI-generated video.",
+  "hashtags": [
+   "#productivity",
+   "#goals",
+   "#aitools"
+  ],
+  "demo": null,
+  "hook_focus": "because",
+  "emphasis": [
+   "because",
+   "sprint",
+   "smallest",
+   "build",
+   "biggest",
+   "assistant",
+   "perfect",
+   "avoiding"
+  ],
+  "takeaway": "Three day sprint.",
+  "hook_score": 40.8,
+  "cta_type": "save",
+  "opinions": [],
+  "evidence": []
+ }
+]

@@ -1,5 +1,6 @@
-"""Motion-graphics edit: paper/orange/dark scenes with circle wipes, kinetic top captions
-(sans + italic serif accents), UI-card props, a gesturing mascot and a synthesized sound bed.
+"""Motion-graphics edit in the brand palette: navy / ivory / forest scenes, four kinds of wipe,
+kinetic top captions (sans + italic serif accent), a different visual prop per beat, a gesturing
+mascot and a synthesized sound bed.
 """
 from __future__ import annotations
 
@@ -15,19 +16,14 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from . import audio as A
-from . import brand, fonts, plan, props
+from . import brand, fonts, palette as PAL, plan, props
 from .puppet import Shubh as Mascot, Pose
 from .animator import Animator
 from .tts import Narration
 
 W, H = 1080, 1920
 FPS = 30
-ORANGE = (255, 86, 34)
-THEMES = {
-    "paper":  dict(bg=(246, 244, 240), text=(22, 22, 26), accent=ORANGE, mono=(150, 150, 156)),
-    "orange": dict(bg=(255, 84, 30), text=(255, 255, 255), accent=(22, 22, 26), mono=(255, 214, 196)),
-    "dark":   dict(bg=(16, 16, 18), text=(255, 255, 255), accent=ORANGE, mono=(150, 150, 156)),
-}
+THEMES = PAL.THEMES
 HEAD_SRC = (512.0, 115.0)
 ANCHOR_SRC = (512.0, 420.0)
 
@@ -49,25 +45,32 @@ def ease_out_back(x, s=1.8):
 
 # ---------------------------------------------------------------------------
 def make_bg(theme: str) -> np.ndarray:
+    """Flat brand colour, a fine dot grid, a soft light behind the mascot and a charcoal floor."""
     t = THEMES[theme]
-    bg = np.empty((H, W, 3), np.uint8)
-    bg[:] = t["bg"][::-1]
-    f = bg.astype(np.float32)
-    if theme == "dark":
-        yy, xx = np.mgrid[0:H, 0:W]
-        cell = 26
-        cy, cx = (yy % cell) - cell / 2, (xx % cell) - cell / 2
-        rad = 1.0 + 6.0 * np.clip((yy - 900) / 1000.0, 0, 1)
-        dots = (np.sqrt(cx * cx + cy * cy) < rad).astype(np.float32)
-        f += dots[..., None] * np.array([60, 60, 62], np.float32) * np.clip((yy - 500) / 900.0, 0, 1)[..., None]
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    f = np.empty((H, W, 3), np.float32)
+    f[:] = np.array(t.bg, np.float32)
+    cell = 44
+    cy, cx = (yy % cell) - cell / 2, (xx % cell) - cell / 2
+    dots = (np.sqrt(cx * cx + cy * cy) < 1.7).astype(np.float32)
+    if theme == "ivory":
+        f += dots[..., None] * (np.array(PAL.CHARCOAL, np.float32) - f[0, 0]) * 0.10
+        glow = np.clip(1 - np.sqrt((xx - 540) ** 2 + (yy - 1250) ** 2) / 900, 0, 1)
+        f += glow[..., None] * np.array([6, 6, 4], np.float32)
+        band = np.clip((yy - 1640) / 60.0, 0, 1)[..., None]
+        f = f * (1 - band * 0.06)
     else:
-        step = 40
-        line = np.zeros((H, W), np.float32)
-        line[::step, :] = 1
-        line[:, ::step] = 1
-        shade = -9.0 if theme == "paper" else -26.0
-        f += line[..., None] * shade * 0.35
-    return np.clip(f, 0, 255).astype(np.uint8)
+        f += dots[..., None] * (np.array(PAL.IVORY, np.float32) - f[0, 0]) * 0.07
+        glow = np.clip(1 - np.sqrt((xx - 540) ** 2 + ((yy - 1250) * 1.25) ** 2) / 760, 0, 1) ** 1.6
+        lift = np.array(PAL.GREY, np.float32) - f[0, 0]
+        f += glow[..., None] * lift * 0.22
+        # charcoal floor, slightly slanted, with a thin gold edge
+        edge = 1545 + (xx - 540) * 0.05
+        floor = np.clip((yy - edge) / 3.0, 0, 1)
+        f = f * (1 - floor[..., None]) + np.array(PAL.CHARCOAL, np.float32) * floor[..., None]
+        line = np.clip(1 - np.abs(yy - edge) / 2.2, 0, 1)
+        f = f * (1 - line[..., None] * 0.55) + np.array(PAL.GOLD, np.float32) * (line[..., None] * 0.55)
+    return np.clip(f, 0, 255).astype(np.uint8)[..., ::-1].copy()
 
 
 def blit(frame, sp, x, y, alpha=1.0):
@@ -141,18 +144,13 @@ def layout_sentence(words, accent_i: int, top: int = 330, left: int = 70, maxw: 
 
 
 def section_labels(sections, script) -> dict[int, str]:
-    labels, n, step_i = {}, 0, 0
-    o = brand.offset(script)
-    keys = sorted({int(k["sentence"]) for k in script.get("key_points", [])})
+    """'// 03 - the layers' for every sentence, numbered by scene (the spoken intro is not counted)."""
+    labels, n = {}, 0
     for sec in sections:
-        n += 1
+        if sec.kind != "intro":
+            n += 1
         for i in range(sec.i0, sec.i1 + 1):
-            if sec.kind == "steps":
-                done = sum(1 for k in keys if k + o <= i)
-                name = f"step {max(1, done)}"
-            else:
-                name = {"intro": "intro", "hook": "hook", "problem": "problem", "payoff": "payoff", "cta": "follow"}[sec.kind]
-            labels[i] = f"// {n:02d} - {name}"
+            labels[i] = f"// {n:02d} - {sec.label}" if sec.kind != "intro" else "// shubh"
     return labels
 
 
@@ -231,13 +229,14 @@ def render_reel(script: dict, nar: Narration, mascot: Mascot, out_path: str, wor
     layouts = []
     for i, wt in enumerate(nar.word_times):
         j = i - o
-        hint = emph[j] if 0 <= j < len(emph) else (script.get("hook_focus") if j == 0 else None)
-        if i == 0 and o:
+        hint = emph[j] if 0 <= j < len(emph) else None
+        if i == 0:
+            hint = (emph[0] if emph else None) or script.get("hook_focus")
+        elif i == 1 and o:
             hint = "Shubh"
         ai = plan.accent_index([w[0] for w in wt], hint)
         layouts.append(layout_sentence(wt, ai))
-    steps = [s for s in sections if s.kind == "steps"]
-    step_starts = steps[0].data["starts"] if steps else []
+    step_starts = [x for s in sections for x in s.data.get("abs_starts", [])]
 
     # sound design
     cuts = [s.t0 for s in sections[1:]]
@@ -270,34 +269,51 @@ def render_reel(script: dict, nar: Narration, mascot: Mascot, out_path: str, wor
             t = i / FPS
             k = max(j for j, s in enumerate(sections) if s.t0 <= t + 1e-6)
             sec = sections[k]
-            # ---- background with circle wipe from the mascot ------------------
+            # ---- background and the wipe into this scene ------------------------
             frame = bgs[sec.theme].copy()
             if k > 0:
                 u = (t - sec.t0) / 0.5
                 if u < 1.0:
-                    old = bgs[sections[k - 1].theme]
-                    r = ease_io(u) * 1750
-                    m = dist < r
+                    old, new = bgs[sections[k - 1].theme], bgs[sec.theme]
+                    e = ease_io(u)
+                    if sec.transition == "slide_up":
+                        edge = H * (1 - e)
+                        m = yy > edge
+                        ring = np.abs(yy - edge) < 4
+                    elif sec.transition == "push":
+                        edge = W * (1 - e)
+                        m = xx > edge
+                        ring = np.abs(xx - edge) < 4
+                    elif sec.transition == "iris":
+                        r = e * 1900
+                        dd = np.abs(xx - 540) + np.abs(yy - 960)
+                        m = dd < r
+                        ring = np.abs(dd - r) < 6
+                    else:
+                        r = e * 1750
+                        m = dist < r
+                        ring = np.abs(dist - r) < 5
                     frame = old.copy()
-                    frame[m] = bgs[sec.theme][m]
-                    ring = (np.abs(dist - r) < 5) & (u > 0.02)
-                    frame[ring] = (255, 255, 255)
+                    frame[m] = new[m]
+                    frame[ring & (u > 0.02)] = PAL.GOLD[::-1]
             th = THEMES[sec.theme if (k == 0 or t - sec.t0 > 0.22) else sections[k - 1].theme]
-            tx = tuple(th["text"])
-            ac = tuple(th["accent"])
+            tx = tuple(th.text)
+            ac = tuple(th.accent)
 
             # ---- header + ticker ---------------------------------------------
             si = max(j for j, (a, b) in enumerate(nar.sentence_times) if a <= t + 1e-6) if t >= nar.sentence_times[0][0] else 0
             hdr = Image.new("RGBA", (W, 90), (0, 0, 0, 0))
             hd = ImageDraw.Draw(hdr)
-            hd.text((70, 24), labels.get(si, ""), font=mono_f, fill=tuple(th["mono"]) + (255,))
-            if step_starts and sec.kind in ("steps", "payoff"):
-                done = sum(1 for s in step_starts if t >= s)
-                val = f"{done}/{len(step_starts)}"
+            hd.text((70, 24), labels.get(si, ""), font=mono_f, fill=tuple(th.mono) + (255,))
+            marks = sec.data.get("abs_starts") if sec.prop in ("flow", "layers", "checklist") else None
+            if marks:
+                done = sum(1 for x in marks if t >= x)
                 vf = fonts.get("bold", 36)
-                hd.text((W - 70, 24), "STEPS", font=fonts.get("mono", 20), fill=tuple(th["mono"]) + (255,), anchor="ra")
-                hd.text((W - 70 - 82, 12), val, font=vf, fill=ORANGE + (255,), anchor="ra")
+                hd.text((W - 70, 12), f"{done}/{len(marks)}", font=vf, fill=(th.c_text if th.marker else th.accent) + (255,), anchor="ra")
             blit(frame, cv2.cvtColor(np.array(hdr), cv2.COLOR_RGBA2BGRA), 0, 238)
+            pw = int((W - 140) * min(1.0, t / duration))
+            cv2.rectangle(frame, (70, 226), (W - 70, 229), PAL.mix(th.bg, th.mono, 0.35)[::-1], -1)
+            cv2.rectangle(frame, (70, 226), (70 + pw, 229), (th.c_fill if th.marker else th.accent)[::-1], -1)
 
             # ---- kinetic caption ---------------------------------------------
             s0, s1 = nar.sentence_times[si]
@@ -308,24 +324,34 @@ def render_reel(script: dict, nar: Narration, mascot: Mascot, out_path: str, wor
                     if u <= 0:
                         continue
                     e = ease_out(u)
-                    spr = word_sprite(cw.text, cw.kind, cw.size, ac if cw.accent else tx)
+                    if cw.accent and th.marker:                       # gold highlighter behind the accent word
+                        wd = int(fonts.get(cw.kind, cw.size).getlength(cw.text))
+                        hl = ease_out((t - cw.t0) / 0.28)
+                        x0, x1 = cw.x - 8, cw.x - 8 + int((wd + 16) * hl)
+                        y0, y1 = int(cw.y - cw.size * 0.66), int(cw.y + cw.size * 0.12)
+                        roi = frame[y0:y1, x0:x1]
+                        if roi.size:
+                            roi[:] = (roi * (1 - 0.92 * fade) + np.array(PAL.GOLD[::-1], np.float32) * 0.92 * fade).astype(np.uint8)
+                    col = tx if (cw.accent and th.marker) else (ac if cw.accent else tx)
+                    spr = word_sprite(cw.text, cw.kind, cw.size, col)
                     blit(frame, spr, cw.x - 8, int(cw.y - cw.size * 1.15 + 16 * (1 - e)), e * fade)
-                    if cw.accent and sec.theme == "paper":
+                    if cw.accent and not th.marker:
                         wd = int(fonts.get(cw.kind, cw.size).getlength(cw.text))
                         ul = ease_out((t - cw.t0) / 0.3)
-                        cv2.line(frame, (cw.x, cw.y + 14), (cw.x + int(wd * ul), cw.y + 14), ORANGE[::-1], 5, cv2.LINE_AA)
+                        cv2.line(frame, (cw.x, cw.y + 14), (cw.x + int(wd * ul), cw.y + 14), PAL.GOLD[::-1], 4, cv2.LINE_AA)
 
             # ---- prop ---------------------------------------------------------
             if sec.prop != "none":
                 tl = t - (sec.t0 + 0.12)
                 exit_u = (t - sec.t1) / 0.2 if k + 1 < len(sections) else 0.0
                 if tl > 0 and exit_u < 1:
-                    spr = self_prop(sec, tl)
+                    spr = self_prop(sec, tl, sec_th(sec))
+                    fit = min(1.12, 560 / spr.shape[0], 980 / spr.shape[1])
                     e = ease_out_back(tl / 0.5)
-                    kscale = (0.80 + 0.20 * e) * (1 + 0.05 * max(exit_u, 0))
+                    kscale = fit * (0.80 + 0.20 * e) * (1 + 0.05 * max(exit_u, 0))
                     spr = scaled(spr, kscale)
                     alpha = min(1.0, tl / 0.18) * (1 - max(exit_u, 0))
-                    cx, cy = 540, 805 + int(70 * (1 - e)) + int(40 * max(exit_u, 0))
+                    cx, cy = 540, 825 + int(70 * (1 - e)) + int(40 * max(exit_u, 0))
                     blit(frame, spr, cx - spr.shape[1] // 2, cy - spr.shape[0] // 2, alpha)
 
             # ---- mascot --------------------------------------------------------
@@ -349,8 +375,8 @@ def render_reel(script: dict, nar: Narration, mascot: Mascot, out_path: str, wor
             if sec.kind == "problem":
                 draw_sweat(frame, hx + 168, hy - 95 + 6 * math.sin(t * 5), t)
             if sec.kind in ("payoff", "cta") and imp > 0.15:
-                draw_sparkle(frame, hx - 210, hy - 130, 26 * min(1, imp), ORANGE if sec.theme != "orange" else (255, 255, 255))
-                draw_sparkle(frame, hx + 215, hy - 60, 18 * min(1, imp), (255, 200, 60))
+                draw_sparkle(frame, hx - 210, hy - 130, 26 * min(1, imp), PAL.GOLD)
+                draw_sparkle(frame, hx + 215, hy - 60, 18 * min(1, imp), PAL.IVORY)
 
             # ---- transition glitch ---------------------------------------------------
             if k > 0 and 0 <= t - sec.t0 < 0.16:
@@ -374,20 +400,41 @@ def render_reel(script: dict, nar: Narration, mascot: Mascot, out_path: str, wor
             "sections": [(s.kind, round(s.t0, 2), s.prop) for s in sections]}
 
 
-def self_prop(sec, tl):
-    if sec.prop == "stat":
-        return props.stat_prop(sec.data["value"], sec.data["label"], tl)
-    if sec.prop == "keyword":
-        return props.keyword_prop(sec.data["word"], tl)
-    if sec.prop == "bars":
-        return props.bars_card(tl)
-    if sec.prop == "checklist":
-        starts = [s - (sec.t0 + 0.12) for s in sec.data["starts"]]
-        return props.checklist_card(sec.data["labels"], starts, tl)
-    if sec.prop == "chat":
-        return props.chat_card(sec.data["prompt"], sec.data["result"], max(0.0, tl - 0.3))
-    if sec.prop == "follow":
-        return props.follow_prop(max(0.0, tl - (sec.data["t_follow"] - (sec.t0 + 0.12))))
+def sec_th(sec):
+    return THEMES[sec.theme]
+
+
+def self_prop(sec, tl, th):
+    d = sec.data
+    rel = [x - (sec.t0 + 0.12) for x in d.get("abs_starts", [])]
+    dur = max(1.0, sec.t1 - sec.t0)
+    typ = sec.prop
+    if typ == "stat":
+        return props.stat_prop(d["value"], d["label"], tl, th)
+    if typ == "keyword":
+        return props.keyword_prop(d["word"], tl, th)
+    if typ == "bars":
+        return props.bars_card(tl, th)
+    if typ == "checklist":
+        return props.checklist_card(list(d["labels"])[:5], rel, tl, th)
+    if typ == "flow":
+        return props.flow_card(list(d["nodes"]), rel, tl, th)
+    if typ == "layers":
+        return props.layers_card(list(d["labels"] if "labels" in d else d["nodes"]), rel, tl, th)
+    if typ == "compare":
+        n = max(1, min(3, len(d["left"].get("rows", []))))
+        starts = [0.5 + j * max(0.7, (dur - 1.2) / n) for j in range(n)]
+        return props.compare_card(d["left"], d["right"], starts, tl, th)
+    if typ == "numeral":
+        return props.numeral_prop(int(d.get("n", 1)), int(d.get("total", 3)), str(d.get("title", "")), tl, th)
+    if typ == "counter":
+        return props.counter_prop(int(d["value"]), str(d.get("unit", "")), str(d.get("label", "")), tl, th)
+    if typ == "definition":
+        return props.definition_card(str(d["term"]), str(d["meaning"]), tl, th)
+    if typ == "chat":
+        return props.chat_card(d["prompt"], d["result"], max(0.0, tl - 0.3), th)
+    if typ == "follow":
+        return props.follow_prop(max(0.0, tl - (d["t_follow"] - (sec.t0 + 0.12))), th)
     raise ValueError(sec.prop)
 
 

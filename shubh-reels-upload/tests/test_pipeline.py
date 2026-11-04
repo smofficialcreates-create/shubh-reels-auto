@@ -1,9 +1,11 @@
 import datetime as dt
+import json
 import unittest
 from unittest import mock
 
-from reelbot import grounding, research, script_gen, topic
+from reelbot import grounding, plan as planner, research, script_gen, topic
 from reelbot.config import Config
+from reelbot.sample import SAMPLE
 
 EXCERPT = (
     "Researchers at a design lab tracked how people work with AI assistants for a month. "
@@ -13,11 +15,8 @@ EXCERPT = (
     "Closing everything except the top task helped people stay focused for longer stretches."
 )
 
+# a source-style script used only to test the grounding checks
 RAW = {
-    "topic": "One clear goal before you open the assistant", "category": "productivity_methods", "tag": "FOCUS",
-    "hook_options": ["You lose forty minutes a day without noticing.", "Your tabs are quietly stealing your afternoon.",
-                     "Stop opening the assistant before this one step."],
-    "hook_mechanisms": ["specific outcome", "problem", "pattern interrupt"], "hook_focus": "forty",
     "sentences": [
         "A design lab tracked how people use assistants.",
         "Workers with many tabs lost about forty minutes a day.",
@@ -25,29 +24,34 @@ RAW = {
         "Second, paste your messy notes and ask it to rank the tasks.",
         "Third, close everything except the top task.",
         "That is how the team kept people focused longer."],
-    "key_points": [{"sentence": 3, "label": "Write one goal"}, {"sentence": 4, "label": "Rank the tasks"},
-                   {"sentence": 5, "label": "Close the rest"}],
-    "takeaway": "Start with one goal, then let an assistant rank your notes.", "demo": None,
-    "emphasis": ["lab", "forty", "goal", "notes", "close", "focused", "save"],
     "evidence": [{"sentence": 2, "quote": "lost about forty minutes a day to switching between them"},
                  {"sentence": 4, "quote": "pasting messy notes into an assistant and asking it to rank the tasks"},
                  {"sentence": 5, "quote": "Closing everything except the top task helped people stay focused"}],
-    "opinions": [], "cta_type": "save", "cta": "Save this for your next work session.",
-    "cover_text": "Stop losing forty minutes a day", "caption": "You lose forty minutes a day.\nOne goal first.\nfocus, tabs\nAI-generated video.",
-    "hashtags": ["#productivity", "#aitools", "#focus"],
 }
-GOOD = {"hook": 17, "accuracy": 18, "value": 16, "retention": 16, "visual": 8, "originality": 7, "unsupported_claims": [], "problems": []}
+
+# a full explainer in the shape the writer returns, built from the built-in sample
+DEEP = dict(SAMPLE)
+DEEP.update(hook_options=[SAMPLE["hook"], "Your AI is guessing, not searching.", "What an AI does before it answers you."],
+            hook_mechanisms=["pattern interrupt", "contrarian", "curiosity gap"], evidence=[], opinions=[])
+GOOD = {"hook": 13, "accuracy": 18, "depth": 16, "clarity": 13, "retention": 12, "visuals": 8, "originality": 4,
+        "unsupported_claims": [], "problems": []}
 
 
-def plan():
+def explainer_plan():
+    e = {"title": "How an AI assistant actually answers you", "category": "practical_ai_tutorials", "analogy": "autocomplete",
+         "stages": ["tokens", "desk", "prediction"], "catch": "it can be wrong"}
+    return {"mode": "explainer", "entry": e, "pillar": e["category"], "seed": e["title"], "category": e["category"]}
+
+
+def source_plan():
     c = research.Candidate(1, "Design lab studies AI focus habits", "https://example.com/a", "Example News", "2026-10-28", 2.0)
     return {"mode": "source", "cand": c, "category": "productivity_methods", "angle": "x", "scores": {}, "total": 80, "excerpt": EXCERPT}
 
 
-def run_attempt(raw, review):
+def run_attempt(raw, review, plan=None):
     calls = iter([raw, review])
     with mock.patch("reelbot.llm.chat_json", side_effect=lambda *a, **k: next(calls)):
-        return script_gen.attempt(Config(), plan(), [], [], dt.date(2026, 10, 30))
+        return script_gen.attempt(Config(), plan or explainer_plan(), [], [], dt.date(2026, 10, 30))
 
 
 class Rubric(unittest.TestCase):
@@ -75,29 +79,150 @@ class Grounding(unittest.TestCase):
 
 
 class Attempt(unittest.TestCase):
-    def test_good_script_passes_and_is_scored(self):
-        script, issues = run_attempt(RAW, GOOD)
+    def test_good_deep_script_passes_and_is_scored(self):
+        script, issues = run_attempt(DEEP, GOOD)
         self.assertEqual(issues, [])
-        self.assertEqual(script["quality"]["total"], 82)
-        self.assertEqual(len(script["evidence_verified"]), 3)
+        self.assertEqual(script["quality"]["total"], 84)
+        self.assertGreaterEqual(len(script["scenes"]), 6)
 
-    def test_invented_quote_is_rejected_before_review(self):
-        bad = dict(RAW, evidence=[{"sentence": 2, "quote": "an invented quotation that never appeared"}] * 3)
-        script, issues = run_attempt(bad, GOOD)
+    def test_thin_script_is_rejected(self):
+        thin = dict(DEEP, sentences=DEEP["sentences"][:6], scenes=[])
+        script, issues = run_attempt(thin, GOOD)
+        self.assertIsNone(script)
+        self.assertTrue(any("too thin" in i for i in issues))
+
+    def test_invented_quote_is_rejected_in_source_mode(self):
+        bad = dict(DEEP, evidence=[{"sentence": 2, "quote": "an invented quotation that never appeared anywhere"}] * 3)
+        script, issues = run_attempt(bad, GOOD, source_plan())
         self.assertIsNone(script)
         self.assertTrue(any("verbatim quote" in i for i in issues))
 
-    def test_low_accuracy_or_unsupported_claims_rejected(self):
-        script, issues = run_attempt(RAW, dict(GOOD, accuracy=12))
-        self.assertIsNone(script)
-        script, issues = run_attempt(RAW, dict(GOOD, unsupported_claims=["tool is free"]))
-        self.assertIsNone(script)
+    def test_low_depth_accuracy_or_unsupported_claims_rejected(self):
+        for review in (dict(GOOD, accuracy=12), dict(GOOD, depth=9), dict(GOOD, unsupported_claims=["tool is free"])):
+            script, issues = run_attempt(DEEP, review)
+            self.assertIsNone(script)
 
     def test_digits_and_free_claims_are_blocked(self):
-        bad = dict(RAW, sentences=RAW["sentences"][:1] + ["Workers lost 40 minutes, and the app is free."] + RAW["sentences"][2:])
-        script, issues = run_attempt(bad, GOOD)
+        s = list(DEEP["sentences"])
+        s[1] = "Workers lost 40 minutes, and the app is free."
+        script, issues = run_attempt(dict(DEEP, sentences=s), GOOD)
         self.assertIsNone(script)
         self.assertTrue(any("digits" in i for i in issues) and any("pricing" in i for i in issues))
+
+
+class Scenes(unittest.TestCase):
+    def lex(self):
+        from vendor.ig_skill import humanize
+        return humanize.load_lexicon()
+
+    def test_counter_needs_a_spoken_number(self):
+        body = ["Workers lost forty minutes a day.", "Everyone else lost time too."]
+        ok = script_gen.finalize_scenes([{"from": 1, "to": 1, "visual": {"type": "counter", "value": 40, "unit": "min", "label": "lost per day"}}], body, self.lex())
+        no = script_gen.finalize_scenes([{"from": 2, "to": 2, "visual": {"type": "counter", "value": 90, "unit": "min", "label": "invented"}}], body, self.lex())
+        self.assertEqual(len(ok), 1)
+        self.assertEqual(no, [])
+
+    def test_visual_text_cannot_carry_prices_or_digits(self):
+        body = ["One plan beats ten.", "Pick it."]
+        got = script_gen.finalize_scenes([{"from": 1, "to": 2, "visual": {"type": "definition", "term": "Plan", "meaning": "It costs 5 dollars"}}], body, self.lex())
+        self.assertEqual(got, [])
+
+    def test_repeated_visual_types_are_flagged(self):
+        sc = [{"from": i, "to": i, "visual": {"type": t}} for i, t in enumerate(["flow", "flow", "compare", "keyword"], 1)]
+        self.assertTrue(any("same visual type" in x for x in script_gen.scene_issues({"scenes": sc})))
+
+    def test_gaps_are_closed(self):
+        sc = [{"from": 2, "to": 3, "visual": {"type": "keyword"}}, {"from": 6, "to": 7, "visual": {"type": "flow"}}]
+        fixed = planner.repair_scenes(sc, 8)
+        self.assertEqual([(x["from"], x["to"]) for x in fixed], [(1, 5), (6, 8)])
+
+    def test_sections_follow_the_scenes_and_never_repeat_a_theme(self):
+        class Nar:
+            sentence_times = [(i * 4.0, i * 4.0 + 3.5) for i in range(len(SAMPLE["sentences"]) + 4)]
+        secs = planner.build_sections(SAMPLE, Nar())
+        self.assertEqual([secs[0].kind, secs[1].kind], ["hook", "intro"])      # hook first, then Shubh
+        self.assertEqual(secs[0].i0, 0)
+        self.assertEqual(secs[-1].kind, "cta")
+        self.assertEqual(len(secs), len(SAMPLE["scenes"]) + 3)
+        for a, b in zip(secs, secs[1:]):
+            self.assertNotEqual(a.theme, b.theme)
+            self.assertNotEqual(a.transition, b.transition)
+        flow = [x for x in secs if x.prop == "flow"][0]
+        self.assertEqual(len(flow.data["abs_starts"]), 3)
+
+
+class Fallback(unittest.TestCase):
+    def test_near_miss_used_only_when_everything_else_failed(self):
+        script_gen._NEAR.clear()
+        low = dict(GOOD, hook=11, accuracy=17, depth=13, clarity=11, retention=11, visuals=6, originality=3)   # 72
+        seq = iter([DEEP, low] * 9)
+        with mock.patch("reelbot.script_gen.build_plans", return_value=[explainer_plan()]), \
+             mock.patch("reelbot.llm.chat_json", side_effect=lambda *a, **k: next(seq)):
+            out = script_gen.generate(Config(), [], dt.date(2026, 10, 30))
+        self.assertEqual(out["mode"], "explainer")
+        self.assertEqual(out["quality"]["total"], 72)
+
+    def test_below_fallback_still_fails(self):
+        script_gen._NEAR.clear()
+        bad = dict(GOOD, hook=8, accuracy=18, depth=10, clarity=8, retention=6, visuals=3, originality=2)    # 55
+        seq = iter([DEEP, bad] * 9)
+        with mock.patch("reelbot.script_gen.build_plans", return_value=[explainer_plan()]), \
+             mock.patch("reelbot.llm.chat_json", side_effect=lambda *a, **k: next(seq)):
+            out = script_gen.generate(Config(), [], dt.date(2026, 10, 30))
+        self.assertEqual(out["mode"], "backup")   # a 55/100 live script is never used
+
+
+class Backup(unittest.TestCase):
+    def test_every_backup_lesson_passes_safety(self):
+        import json
+        bank = json.load(open("data/backup_scripts.json", encoding="utf-8"))
+        self.assertGreaterEqual(len(bank), 15)
+        from reelbot import safety
+        for b in bank:
+            self.assertEqual(safety.check_script(b), [], b["topic"])
+            self.assertEqual(len(b["emphasis"]), len(b["sentences"]) + 2)
+
+    def test_total_ai_outage_still_gives_a_script_and_rotates(self):
+        script_gen._NEAR.clear()
+        with mock.patch("reelbot.script_gen.build_plans", side_effect=RuntimeError("boom")):
+            a = script_gen.generate(Config(), [], dt.date(2026, 11, 3))
+            b = script_gen.generate(Config(), [{"topic": a["topic"]}], dt.date(2026, 11, 4))
+        self.assertEqual(a["mode"], "backup")
+        self.assertNotEqual(a["topic"], b["topic"])
+
+    def test_all_attempts_fail_falls_to_backup(self):
+        script_gen._NEAR.clear()
+        with mock.patch("reelbot.script_gen.build_plans", return_value=[explainer_plan()]), \
+             mock.patch("reelbot.llm.chat_json", side_effect=RuntimeError("down")):
+            self.assertEqual(script_gen.generate(Config(), [], dt.date(2026, 11, 3))["mode"], "backup")
+
+
+class Order(unittest.TestCase):
+    def test_hook_is_spoken_before_the_intro(self):
+        from reelbot import brand
+        lines = brand.spoken(SAMPLE)
+        self.assertEqual(lines[0], SAMPLE["hook"])
+        self.assertEqual(lines[1], brand.INTRO)
+        self.assertEqual(lines[-1], brand.OUTRO)
+        self.assertEqual(len(lines), len(SAMPLE["sentences"]) + 4)
+
+    def test_post_time_wait(self):
+        import datetime as d
+        from reelbot import publish
+        ist = publish.IST
+        slept = []
+        with mock.patch("reelbot.publish.dt") as m, mock.patch("reelbot.publish.time.sleep", side_effect=slept.append):
+            m.timedelta = d.timedelta
+            m.datetime.now.return_value = d.datetime(2026, 11, 4, 19, 0, tzinfo=ist)
+            publish.wait_until("19:30")                      # 27 minutes to go once the 3 minute lead is taken off
+            self.assertAlmostEqual(slept[0], 27 * 60, delta=1)
+            slept.clear()
+            m.datetime.now.return_value = d.datetime(2026, 11, 4, 14, 0, tzinfo=ist)
+            publish.wait_until("19:30")                      # more than 90 minutes away: post now
+            self.assertEqual(slept, [])
+            m.datetime.now.return_value = d.datetime(2026, 11, 4, 19, 40, tzinfo=ist)
+            publish.wait_until("19:30")                      # already past: post now
+            self.assertEqual(slept, [])
 
 
 class Research(unittest.TestCase):

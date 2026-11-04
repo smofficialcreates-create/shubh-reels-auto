@@ -10,7 +10,8 @@ from PIL import Image, ImageDraw
 
 from . import fonts, plan
 from .animator import Animator
-from .editor import ORANGE, make_bg
+from . import palette as PAL
+from .editor import make_bg
 from .puppet import Shubh
 
 W, H = 1080, 1920
@@ -32,15 +33,15 @@ def _wrap(words, accent_i, maxw=900):
 def render_cover(script: dict, puppet: Shubh, out_path: str) -> str:
     words = script.get("cover_text", "").split() or script["hook"].split()[:7]
     ai = plan.accent_index(words, script.get("hook_focus"))
-    frame = make_bg("paper").copy()
+    frame = make_bg("navy").copy()
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    d.text((90, 330), "// SHUBH", font=fonts.get("mono", 30), fill=(150, 150, 156, 255))
+    d.text((90, 330), "// SHUBH", font=fonts.get("mono", 30), fill=PAL.GREY + (255,))
     for w, kind, size, x, y, acc in _wrap(words, ai):
         f = fonts.get(kind, size)
-        d.text((x, y), w, font=f, fill=(ORANGE if acc else (22, 22, 26)) + (255,), anchor="ls")
+        d.text((x, y), w, font=f, fill=(PAL.GOLD if acc else PAL.IVORY) + (255,), anchor="ls")
         if acc:
-            d.line([(x, y + 22), (x + int(f.getlength(w)), y + 22)], fill=ORANGE + (255,), width=9)
+            d.line([(x, y + 22), (x + int(f.getlength(w)), y + 22)], fill=PAL.GOLD + (255,), width=7)
     over = cv2.cvtColor(np.array(img), cv2.COLOR_RGBA2BGRA)
     a = over[..., 3:4] / 255.0
     frame[:] = (frame * (1 - a) + over[..., :3] * a).astype(np.uint8)

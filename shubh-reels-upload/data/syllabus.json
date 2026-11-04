@@ -1,0 +1,398 @@
+[
+ {
+  "title": "How an AI assistant actually answers you",
+  "category": "practical_ai_tutorials",
+  "analogy": "a very well-read autocomplete",
+  "stages": [
+   "your text is cut into tokens",
+   "the model weighs everything in the chat",
+   "it predicts the next token, again and again",
+   "the reply streams out"
+  ],
+  "catch": "it sounds equally sure when it is wrong, so check what matters"
+ },
+ {
+  "title": "The context window: why long chats forget",
+  "category": "practical_ai_tutorials",
+  "analogy": "a desk with limited space",
+  "stages": [
+   "everything in the chat sits on the desk",
+   "old pages fall off when the desk is full",
+   "key facts belong at the top",
+   "summarise and restart a long chat"
+  ],
+  "catch": "the assistant does not know what it can no longer see"
+ },
+ {
+  "title": "RAG explained: giving an AI your own documents",
+  "category": "practical_ai_tutorials",
+  "analogy": "an open book exam",
+  "stages": [
+   "split your documents into pieces",
+   "search for the pieces that match the question",
+   "paste those pieces into the prompt",
+   "answer using only those pieces"
+  ],
+  "catch": "if the search finds the wrong pieces, the answer is wrong"
+ },
+ {
+  "title": "AI agents versus chatbots",
+  "category": "practical_ai_tutorials",
+  "analogy": "a clerk who answers versus an assistant who runs errands",
+  "stages": [
+   "a goal replaces a question",
+   "the agent makes a plan",
+   "it uses tools to act",
+   "it checks the result and adjusts"
+  ],
+  "catch": "small mistakes compound, so keep a human check at key points"
+ },
+ {
+  "title": "The role, context, task, format prompt",
+  "category": "practical_ai_tutorials",
+  "analogy": "briefing a new colleague on their first day",
+  "stages": [
+   "role: who the assistant should be",
+   "context: what it needs to know",
+   "task: the one thing to do",
+   "format: what the answer should look like"
+  ],
+  "catch": "a very long prompt can bury the task, so keep it tight"
+ },
+ {
+  "title": "Why AI hallucinates and how to catch it",
+  "category": "practical_ai_tutorials",
+  "analogy": "a confident improv actor who never says cut",
+  "stages": [
+   "the model completes patterns, it does not look facts up",
+   "gaps in what it knows get filled with plausible text",
+   "ask for sources and reasoning",
+   "check one key detail somewhere trusted"
+  ],
+  "catch": "fluent writing is not evidence of truth"
+ },
+ {
+  "title": "Prompting, RAG and fine-tuning: which one when",
+  "category": "practical_ai_tutorials",
+  "analogy": "briefing a person, handing them a manual, or training them for months",
+  "stages": [
+   "prompting: tell it what you want now",
+   "RAG: give it the right documents",
+   "fine-tuning: teach it a style or skill",
+   "start with the cheapest and move up"
+  ],
+  "catch": "most problems are solved before fine-tuning is needed"
+ },
+ {
+  "title": "Automation: triggers, filters and actions",
+  "category": "underrated_tools",
+  "analogy": "a doorbell that sets off a chain of events",
+  "stages": [
+   "a trigger starts the flow",
+   "a filter decides if it should continue",
+   "an action does the work",
+   "test it with a real example"
+  ],
+  "catch": "automations fail quietly, so add an alert for failures"
+ },
+ {
+  "title": "Temperature: why one prompt gives different answers",
+  "category": "practical_ai_tutorials",
+  "analogy": "a creativity dial",
+  "stages": [
+   "low temperature picks the safest next word",
+   "high temperature takes more risks",
+   "use low for facts and summaries",
+   "use high for ideas and names"
+  ],
+  "catch": "turning it up makes mistakes more likely, not answers better"
+ },
+ {
+  "title": "Embeddings: how AI understands meaning",
+  "category": "practical_ai_tutorials",
+  "analogy": "a library shelved by meaning instead of by title",
+  "stages": [
+   "text becomes a point on a map",
+   "similar meanings sit close together",
+   "search by closeness, not by exact words",
+   "this powers smart search and recommendations"
+  ],
+  "catch": "closeness is not truth, it only means similar"
+ },
+ {
+  "title": "Chain of thought: ask the AI to show its steps",
+  "category": "practical_ai_tutorials",
+  "analogy": "showing your working in a maths exam",
+  "stages": [
+   "ask it to think step by step",
+   "each step becomes context for the next",
+   "errors become visible",
+   "ask for the answer after the steps"
+  ],
+  "catch": "a neat chain can still be wrong, so read the steps"
+ },
+ {
+  "title": "Break a big ask into small prompts",
+  "category": "practical_ai_tutorials",
+  "analogy": "an assembly line instead of one worker doing everything",
+  "stages": [
+   "split the job into stages",
+   "feed each output into the next prompt",
+   "check each stage before moving on",
+   "combine the pieces at the end"
+  ],
+  "catch": "one giant prompt hides which part went wrong"
+ },
+ {
+  "title": "The Eisenhower matrix",
+  "category": "productivity_methods",
+  "analogy": "sorting your mail into four trays",
+  "stages": [
+   "urgent and important: do it now",
+   "important but not urgent: schedule it",
+   "urgent but not important: hand it off",
+   "neither: drop it"
+  ],
+  "catch": "if everything feels urgent, the sorting has not happened yet"
+ },
+ {
+  "title": "Time blocking and where it breaks",
+  "category": "productivity_methods",
+  "analogy": "booking meetings with yourself",
+  "stages": [
+   "list the tasks that matter",
+   "give each a block on the calendar",
+   "protect the blocks like meetings",
+   "leave a spare block for surprises"
+  ],
+  "catch": "a plan with no slack collapses on the first interruption"
+ },
+ {
+  "title": "The Pomodoro method",
+  "category": "productivity_methods",
+  "analogy": "sprints with a built in finish line",
+  "stages": [
+   "pick one task",
+   "work for one short sprint",
+   "take a short break",
+   "after four sprints take a longer one"
+  ],
+  "catch": "it suits tasks with a clear next step, not open ended thinking"
+ },
+ {
+  "title": "Parkinson's law and deadlines",
+  "category": "productivity_methods",
+  "analogy": "a suitcase that fills to whatever size it is",
+  "stages": [
+   "work stretches to fit the time you give it",
+   "set a shorter deadline on purpose",
+   "define done before you start",
+   "review what you actually finished"
+  ],
+  "catch": "too tight a deadline lowers quality, so keep it realistic"
+ },
+ {
+  "title": "Spaced repetition",
+  "category": "psychology_learning",
+  "analogy": "watering a plant just before it dries out",
+  "stages": [
+   "learn the idea once",
+   "review it just before you would forget",
+   "widen the gaps each time",
+   "test yourself instead of rereading"
+  ],
+  "catch": "reviewing too early wastes time and too late means starting again"
+ },
+ {
+  "title": "Deep work versus shallow work",
+  "category": "productivity_methods",
+  "analogy": "cooking a meal versus washing dishes",
+  "stages": [
+   "shallow work is easy to interrupt",
+   "deep work needs a long clear block",
+   "schedule it at your sharpest time",
+   "batch the shallow work together"
+  ],
+  "catch": "deep work is a skill, so start with a short block"
+ },
+ {
+  "title": "Capture, organise, review: a second brain",
+  "category": "productivity_methods",
+  "analogy": "a kitchen with a prep station, shelves and a weekly clean",
+  "stages": [
+   "capture everything in one inbox",
+   "sort it by what you will use it for",
+   "review the inbox weekly",
+   "turn notes into something you ship"
+  ],
+  "catch": "a perfect system you never open is worse than a simple one you do"
+ },
+ {
+  "title": "Energy matching: put the right task in the right hour",
+  "category": "productivity_methods",
+  "analogy": "using the best knife for the hardest cut",
+  "stages": [
+   "notice when you think clearly",
+   "put hard work there",
+   "put routine work in low energy hours",
+   "protect the hard hour from meetings"
+  ],
+  "catch": "your best hours are personal, so observe before you plan"
+ },
+ {
+  "title": "The STAR method for interview answers",
+  "category": "career_skills",
+  "analogy": "telling the story of one project",
+  "stages": [
+   "situation: set the scene briefly",
+   "task: what you were responsible for",
+   "action: what you did and why",
+   "result: what changed because of it"
+  ],
+  "catch": "most answers are all action and no result"
+ },
+ {
+  "title": "T shaped skills",
+  "category": "career_skills",
+  "analogy": "the letter T",
+  "stages": [
+   "the vertical bar is one deep skill",
+   "the top bar is broad working knowledge",
+   "depth earns trust",
+   "breadth lets you work with others"
+  ],
+  "catch": "breadth without any depth reads as generic"
+ },
+ {
+  "title": "Feedback that lands: situation, behaviour, impact",
+  "category": "career_skills",
+  "analogy": "describing what a camera would have recorded",
+  "stages": [
+   "situation: when and where",
+   "behaviour: what you saw, not what you assume",
+   "impact: what it caused",
+   "then ask for their view"
+  ],
+  "catch": "mixing in guesses about motives makes people defensive"
+ },
+ {
+  "title": "Negotiation basics: interests and alternatives",
+  "category": "career_skills",
+  "analogy": "two people building one deal, not splitting one pie",
+  "stages": [
+   "know what you really need",
+   "learn what the other side needs",
+   "know your best alternative",
+   "propose options that serve both"
+  ],
+  "catch": "going in without an alternative weakens every move"
+ },
+ {
+  "title": "Asking for help at work without sounding lost",
+  "category": "career_skills",
+  "analogy": "handing someone a map with your route drawn on it",
+  "stages": [
+   "say what you are trying to do",
+   "say what you already tried",
+   "ask one specific question",
+   "say thanks and report back"
+  ],
+  "catch": "vague questions get vague answers"
+ },
+ {
+  "title": "A portfolio that proves your skill",
+  "category": "career_skills",
+  "analogy": "a shop window instead of a catalogue",
+  "stages": [
+   "choose a few projects, not all of them",
+   "show the problem and your role",
+   "show the result in plain words",
+   "make it easy to find and read"
+  ],
+  "catch": "quantity hides your best work"
+ },
+ {
+  "title": "The five whys: finding the root cause",
+  "category": "step_by_step_workflows",
+  "analogy": "peeling an onion",
+  "stages": [
+   "state the problem plainly",
+   "ask why and write the answer",
+   "ask why of that answer, again",
+   "stop when you reach something you can fix"
+  ],
+  "catch": "the first reason is usually a symptom, not the cause"
+ },
+ {
+  "title": "Learning a skill fast: deconstruct, practise, feedback",
+  "category": "psychology_learning",
+  "analogy": "learning a song by sections",
+  "stages": [
+   "break the skill into small parts",
+   "practise the weakest part first",
+   "get feedback quickly",
+   "repeat in short sessions"
+  ],
+  "catch": "practising what you already do well feels good and teaches little"
+ },
+ {
+  "title": "The cold message that gets a reply",
+  "category": "career_skills",
+  "analogy": "making an easy yes",
+  "stages": [
+   "show you read their work",
+   "say who you are in one line",
+   "ask one small specific question",
+   "make replying take under a minute"
+  ],
+  "catch": "asking for a big favour in the first message closes the door"
+ },
+ {
+  "title": "A meeting that works: purpose, decision, owner",
+  "category": "business_insights",
+  "analogy": "a flight with a destination and a pilot",
+  "stages": [
+   "say the purpose in one line",
+   "name the decision needed",
+   "assign an owner for each action",
+   "send the notes the same day"
+  ],
+  "catch": "a meeting without a decision is a conversation, so use a message"
+ },
+ {
+  "title": "Writing clearly: lead with the answer",
+  "category": "career_skills",
+  "analogy": "a news story with the headline first",
+  "stages": [
+   "start with the conclusion",
+   "give the two or three reasons",
+   "add detail only where it helps",
+   "end with what you need from the reader"
+  ],
+  "catch": "building up to the point makes busy readers stop reading"
+ },
+ {
+  "title": "Reversible and irreversible decisions",
+  "category": "business_insights",
+  "analogy": "two way doors and one way doors",
+  "stages": [
+   "ask if you can undo the choice",
+   "for two way doors decide quickly",
+   "for one way doors slow down and gather facts",
+   "review the decision later"
+  ],
+  "catch": "treating every choice as one way freezes you"
+ },
+ {
+  "title": "The habit loop: cue, routine, reward",
+  "category": "psychology_learning",
+  "analogy": "a path worn into grass",
+  "stages": [
+   "a cue starts the habit",
+   "the routine is the action",
+   "the reward makes you repeat it",
+   "attach the new habit to an existing cue"
+  ],
+  "catch": "changing the routine is easier than removing the cue"
+ }
+]

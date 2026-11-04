@@ -84,3 +84,19 @@ Every day the bot chooses a topic from fresh sources rather than from memory:
 Outputs per run: `reel.mp4`, `cover.jpg` (used as the Instagram cover), `caption.txt`, `research.json`.
 
 Adopted from the master prompt: trend sourcing, scoring, hook options, evidence grounding, QC rubric, category diversification, cover, chat-demo scene, CTA types. Left out: unverifiable "viral prediction", scraping Instagram/TikTok (ToS), paid tools, long multi-file output format.
+
+
+## Look, palette and scenes (v3)
+
+**Palette** (`reelbot/palette.py`): Midnight Navy 50 %, Warm Ivory 20 %, Charcoal 15 %, Forest Green 10 %, Antique Gold 5 %.
+Navy is the main stage, ivory scenes use a gold highlighter on the accent word, forest marks growth and the closing scene,
+charcoal is the floor under Shubh and the cards on ivory scenes, gold is only for highlights.
+
+**Scenes.** Every reel is split into 5-8 scenes. Each scene has its own on-screen visual, chosen by the writer to fit the idea:
+definition card, flow chain, layer stack, side-by-side compare, step badge, counting number, checklist, chat demo or keyword.
+Themes rotate by topic, no two neighbouring scenes share a theme or a wipe (circle, slide, push, iris), so reels differ from each other.
+
+**Scripts.** Explainer scripts (about 70 seconds, 150-215 words) follow: hook, define, one running analogy, three to five stages
+(mechanism plus example), the catch, a one-line recap, call to action. Topics come from fresh news (grounded in the article)
+or from `data/syllabus.json` (33 stable concepts). The reviewer scores hook, accuracy, depth, clarity, retention, visuals and
+originality (pass 76, accuracy at least 16, depth at least 12). If everything fails, a pre-checked lesson from `data/backup_scripts.json` is used.

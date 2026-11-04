@@ -4,8 +4,11 @@ OUTRO = "Thanks for watching. Follow for more smart ways to work, and I'll see y
 
 
 def spoken(script: dict) -> list[str]:
-    """Every spoken line in order: intro, hook, body, closing line, outro."""
-    return [INTRO, script["hook"]] + script["sentences"] + [script["cta"], OUTRO]
+    """Every spoken line in order: hook, intro, body, closing line, outro.
+    The hook comes first so the first two seconds are the scroll-stopper; Shubh introduces himself right after it."""
+    if not script.get("with_brand", True):
+        return [script["hook"]] + script["sentences"] + [script["cta"]]
+    return [script["hook"], INTRO] + script["sentences"] + [script["cta"], OUTRO]
 
 
 def offset(script: dict) -> int:

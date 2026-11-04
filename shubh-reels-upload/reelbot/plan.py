@@ -45,14 +45,76 @@ def find_number(sentence: str):
 
 @dataclass
 class Section:
-    kind: str                      # hook | problem | steps | payoff | cta
+    kind: str                      # intro | hook | problem | steps | payoff | cta   (drives the gestures)
     i0: int
     i1: int
     t0: float
     t1: float
-    theme: str                     # paper | orange | dark
-    prop: str                      # stat | keyword | bars | checklist | follow | none
+    theme: str                     # navy | ivory | forest
+    prop: str                      # visual type, or none
     data: dict = field(default_factory=dict)
+    label: str = ""
+    transition: str = "circle"
+
+
+VISUAL_KIND = {"compare": "problem", "bars": "problem", "flow": "steps", "layers": "steps", "numeral": "steps",
+               "checklist": "steps", "definition": "steps", "chat": "payoff", "counter": "payoff", "keyword": "payoff",
+               "stat": "payoff"}
+DEFAULT_LABEL = {"compare": "side by side", "bars": "the problem", "flow": "how it flows", "layers": "the layers",
+                 "numeral": "the step", "checklist": "the plan", "definition": "in plain words", "chat": "try it",
+                 "counter": "the numbers", "keyword": "remember this", "stat": "the numbers"}
+THEME_CYCLE = ["navy", "ivory", "navy", "navy", "forest", "navy", "ivory", "navy", "navy", "ivory", "navy", "forest"]
+TRANSITIONS = ["circle", "slide_up", "push", "circle", "iris", "slide_up"]
+
+
+def _seed(script: dict) -> int:
+    return sum(ord(c) * (i + 1) for i, c in enumerate(script.get("topic", "reel"))) % 9973
+
+
+def legacy_scenes(script: dict) -> list[dict]:
+    """Older scripts (no 'scenes'): problem / steps / payoff derived from the key points."""
+    n = len(script["sentences"])
+    keys = sorted({int(k["sentence"]) for k in script.get("key_points", []) if 1 <= int(k["sentence"]) <= n})
+    out = []
+    if keys:
+        if keys[0] > 1:
+            out.append({"from": 1, "to": keys[0] - 1, "visual": {"type": "bars"}})
+        out.append({"from": keys[0], "to": keys[-1], "visual": {
+            "type": "checklist", "labels": [k["label"] for k in sorted(script["key_points"], key=lambda k: int(k["sentence"]))][:3],
+            "sync": keys[:3]}})
+        if keys[-1] < n:
+            demo = script.get("demo")
+            if demo and demo.get("prompt") and demo.get("result"):
+                v = {"type": "chat", "prompt": demo["prompt"], "result": demo["result"]}
+            else:
+                v = {"type": "keyword", "word": None}
+            out.append({"from": keys[-1] + 1, "to": n, "visual": v})
+    else:
+        mid = max(1, n // 2)
+        out.append({"from": 1, "to": mid, "visual": {"type": "bars"}})
+        if mid < n:
+            out.append({"from": mid + 1, "to": n, "visual": {"type": "keyword", "word": None}})
+    return out
+
+
+def repair_scenes(scenes: list[dict], n: int) -> list[dict]:
+    """Sorted, inside 1..n, no overlaps, no gaps (a gap is absorbed by the scene before it)."""
+    good = []
+    for sc in sorted((s for s in scenes if isinstance(s, dict) and isinstance(s.get("visual"), dict)),
+                     key=lambda s: int(s.get("from", 0))):
+        a, b = max(1, int(sc.get("from", 1))), min(n, int(sc.get("to", sc.get("from", 1))))
+        if good and a <= good[-1]["to"]:
+            a = good[-1]["to"] + 1
+        if a > b:
+            continue
+        good.append({**sc, "from": a, "to": b})
+    if not good:
+        return []
+    good[0]["from"] = 1
+    for x, y in zip(good, good[1:]):
+        x["to"] = y["from"] - 1
+    good[-1]["to"] = n
+    return good
 
 
 def build_sections(script: dict, nar) -> list[Section]:
@@ -61,53 +123,63 @@ def build_sections(script: dict, nar) -> list[Section]:
     outro = 1 if o else 0
     n_body = len(script["sentences"])
     last = n_body + 1                                   # cta index
-    keys = sorted({int(k["sentence"]) for k in script.get("key_points", []) if 1 <= int(k["sentence"]) <= n_body})
-    cuts = [("hook", 0, 0)]
-    if keys:
-        if keys[0] > 1:
-            cuts.append(("problem", 1, keys[0] - 1))
-        cuts.append(("steps", keys[0], keys[-1]))
-        if keys[-1] < n_body:
-            cuts.append(("payoff", keys[-1] + 1, n_body))
+    text_all = [script["hook"]] + script["sentences"] + [script["cta"]]
+    scenes = repair_scenes(script.get("scenes") or [], n_body) or repair_scenes(legacy_scenes(script), n_body)
+    seed = _seed(script)
+
+    def times(a, b):
+        ia, ib = a + o, b + o
+        return nar.sentence_times[ia][0] if ia > 0 else 0.0, nar.sentence_times[ib][1] + 0.25
+
+    secs: list[Section] = []
+    # the hook is spoken first (index 0); Shubh introduces himself right after it (index 1)
+    num = find_number(text_all[0])
+    if num:
+        hv = {"type": "stat", "value": num[0], "label": num[1]}
     else:
-        mid = max(1, n_body // 2)
-        cuts += [("problem", 1, mid)] + ([("payoff", mid + 1, n_body)] if mid < n_body else [])
-    cuts.append(("cta", last, last))
-    themes = {"hook": "paper", "problem": "orange", "steps": "paper", "payoff": "dark", "cta": "paper"}
-    secs = []
+        ws = text_all[0].split()
+        hv = {"type": "keyword", "word": clean(ws[accent_index(ws, script.get("hook_focus"))])}
+    secs.append(Section("hook", 0, 0, 0.0, nar.sentence_times[0][1] + 0.25, "navy", hv["type"], hv, "the hook"))
     if o:
-        secs.append(Section("intro", 0, 0, 0.0, nar.sentence_times[0][1] + 0.25, "paper", "keyword", {"word": "Shubh"}))
-    for kind, a, b in cuts:
-        ia, ib = a + o, b + o + (outro if kind == "cta" else 0)
-        t0 = nar.sentence_times[ia][0] if ia > 0 else 0.0
-        t1 = nar.sentence_times[ib][1] + 0.25
-        sec = Section(kind, ia, ib, t0, t1, themes[kind], "none")
-        text_all = [script["hook"]] + script["sentences"] + [script["cta"]]
-        if kind == "hook":
-            num = find_number(text_all[0])
-            if num:
-                sec.prop, sec.data = "stat", {"value": num[0], "label": num[1]}
-            else:
-                ws = text_all[0].split()
-                sec.prop, sec.data = "keyword", {"word": clean(ws[accent_index(ws, script.get("hook_focus"))])}
-        elif kind == "problem":
-            sec.prop = "bars"
-        elif kind == "steps":
-            sec.prop = "checklist"
-            sec.data = {"labels": [k["label"] for k in sorted(script["key_points"], key=lambda k: int(k["sentence"]))][:3],
-                        "starts": [nar.sentence_times[int(k) + o][0] for k in keys][:3]}
-        elif kind == "payoff":
-            demo = script.get("demo")
-            if demo and demo.get("prompt") and demo.get("result"):
-                sec.prop, sec.data = "chat", {"prompt": demo["prompt"], "result": demo["result"]}
-            else:
-                ws = text_all[b].split()
-                sec.prop, sec.data = "keyword", {"word": clean(ws[accent_index(ws)])}
-        elif kind == "cta":
-            sec.prop = "follow"
-            sec.data = {"t_follow": nar.sentence_times[ib][0] if outro else t0}
+        secs.append(Section("intro", 1, 1, nar.sentence_times[1][0], nar.sentence_times[1][1] + 0.25, "navy", "keyword",
+                            {"word": "Shubh"}, "intro"))
+    # body scenes
+    for k, sc in enumerate(scenes):
+        a, b = sc["from"], sc["to"]
+        v = dict(sc["visual"])
+        typ = v.get("type", "keyword")
+        if typ == "keyword" and not v.get("word"):
+            ws = text_all[b].split()
+            v["word"] = clean(ws[accent_index(ws)])
+        t0, t1 = times(a, b)
+        sync = [int(x) for x in v.get("sync", []) if isinstance(x, (int, float)) and a <= int(x) <= b]
+        nodes = v.get("nodes") or v.get("labels") or []
+        if typ in ("flow", "layers", "checklist"):
+            need = len(nodes)
+            if len(sync) != need:                       # spread evenly over the sentences of the scene
+                span = list(range(a, b + 1))
+                sync = [span[min(len(span) - 1, int(j * len(span) / max(1, need)))] for j in range(need)]
+            v["abs_starts"] = [nar.sentence_times[x + o][0] for x in sync]
+            if len({round(x, 2) for x in v["abs_starts"]}) < len(v["abs_starts"]):      # several items in one sentence: spread them
+                lo, hi = t0 + 0.4, max(t0 + 1.2, t1 - 1.2)
+                v["abs_starts"] = [lo + (hi - lo) * j / max(1, need) for j in range(need)]
+        sec = Section(VISUAL_KIND.get(typ, "payoff"), a + o, b + o, t0, t1,
+                      THEME_CYCLE[(seed + k * 1) % len(THEME_CYCLE)], typ, v,
+                      sc.get("label") or DEFAULT_LABEL.get(typ, "next"),
+                      TRANSITIONS[(seed + k) % len(TRANSITIONS)])
         secs.append(sec)
-    # sections run back to back
+    # cta (with the spoken outro)
+    ia, ib = last + o, last + o + outro
+    t0 = nar.sentence_times[ia][0]
+    t1 = nar.sentence_times[ib][1] + 0.25
+    secs.append(Section("cta", ia, ib, t0, t1, "forest", "follow",
+                        {"t_follow": nar.sentence_times[ib][0] if outro else t0}, "follow"))
+    # no two neighbouring scenes share a theme or a transition
+    for prev, cur in zip(secs, secs[1:]):
+        if cur.kind != "cta" and cur.theme == prev.theme:
+            cur.theme = "ivory" if prev.theme == "navy" else "navy"
+        if cur.transition == prev.transition:
+            cur.transition = TRANSITIONS[(TRANSITIONS.index(cur.transition) + 1) % len(TRANSITIONS)]
     for a, b in zip(secs, secs[1:]):
         a.t1 = b.t0
     return secs

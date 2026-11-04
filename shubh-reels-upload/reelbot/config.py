@@ -22,6 +22,7 @@ class Config:
     ig_token: str = field(default_factory=lambda: _env("IG_ACCESS_TOKEN"))
     graph_host: str = field(default_factory=lambda: _env("IG_GRAPH_HOST", "graph.instagram.com"))
     graph_version: str = field(default_factory=lambda: _env("IG_GRAPH_VERSION", "v23.0"))
+    post_at: str = field(default_factory=lambda: _env("POST_AT_IST"))      # e.g. 19:30, India time
     repo: str = field(default_factory=lambda: _env("GITHUB_REPOSITORY"))
     gh_token: str = field(default_factory=lambda: _env("GITHUB_TOKEN"))
     publish_mode: str = field(default_factory=lambda: _env("PUBLISH_MODE", "auto"))   # auto | dry
