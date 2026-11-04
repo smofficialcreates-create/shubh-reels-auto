@@ -2,7 +2,7 @@ name: daily-reel
 
 on:
   schedule:
-    - cron: "30 12 * * *"        # 12:30 UTC = 18:00 IST
+    - cron: "0 13 * * *"          # 13:00 UTC = 18:30 IST: starts early, then waits until the post time
   workflow_dispatch:
     inputs:
       dry_run:
@@ -20,7 +20,7 @@ concurrency:
 jobs:
   reel:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     defaults:
       run:
         working-directory: shubh-reels-upload
@@ -53,6 +53,7 @@ jobs:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_GRAPH_HOST: ${{ vars.IG_GRAPH_HOST }}
+          POST_AT_IST: ${{ vars.POST_AT_IST || '19:30' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           KOKORO_VOICE: ${{ vars.KOKORO_VOICE }}
           PUBLISH_MODE: ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && 'dry' || vars.PUBLISH_MODE || 'auto' }}
