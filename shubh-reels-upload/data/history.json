@@ -48,5 +48,15 @@
     "mode": "explainer",
     "quality": 82,
     "media_id": "17922737742457497"
+  },
+  {
+    "date": "2026-11-05",
+    "topic": "Box's Nemotron Retrieval",
+    "category": "research_findings",
+    "hook": "Nobody tells you why embeddings speed up answers.",
+    "source_url": "https://techcrunch.com/2026/11/05/box-taps-nvidias-nemotron-for-new-agent-first-content-retrieval-system/",
+    "mode": "source",
+    "quality": 90,
+    "media_id": "18374858143214755"
   }
 ]
