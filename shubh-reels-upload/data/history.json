@@ -68,5 +68,15 @@
     "mode": "explainer",
     "quality": 85,
     "media_id": "18234171886331280"
+  },
+  {
+    "date": "2026-11-07",
+    "topic": "Temperature: why one prompt gives different answers",
+    "category": "practical_ai_tutorials",
+    "hook": "Nobody tells you why temperature changes answers.",
+    "source_url": null,
+    "mode": "explainer",
+    "quality": 86,
+    "media_id": "18135256762772430"
   }
 ]
