@@ -78,5 +78,15 @@
     "mode": "explainer",
     "quality": 86,
     "media_id": "18135256762772430"
+  },
+  {
+    "date": "2026-11-08",
+    "topic": "How an AI assistant actually answers you",
+    "category": "practical_ai_tutorials",
+    "hook": "You are using AI the wrong way.",
+    "source_url": null,
+    "mode": "backup",
+    "quality": null,
+    "media_id": "17954634147325883"
   }
 ]
