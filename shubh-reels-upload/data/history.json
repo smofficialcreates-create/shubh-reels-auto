@@ -88,5 +88,15 @@
     "mode": "backup",
     "quality": null,
     "media_id": "17954634147325883"
+  },
+  {
+    "date": "2026-11-09",
+    "topic": "The Pomodoro Method",
+    "category": "productivity_methods",
+    "hook": "Working harder is not why you are behind.",
+    "source_url": null,
+    "mode": "explainer",
+    "quality": 85,
+    "media_id": "18053765693811616"
   }
 ]
