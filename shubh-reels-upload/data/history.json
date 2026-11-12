@@ -108,5 +108,15 @@
     "mode": "explainer",
     "quality": 82,
     "media_id": "18108945716457876"
+  },
+  {
+    "date": "2026-11-12",
+    "topic": "Locking GitHub Actions",
+    "category": "step_by_step_workflows",
+    "hook": "Nobody tells you why actions get hijacked",
+    "source_url": "https://hugovk.dev/blog/2026/lock-github-actions/",
+    "mode": "source",
+    "quality": 79,
+    "media_id": "18436428403150407"
   }
 ]
