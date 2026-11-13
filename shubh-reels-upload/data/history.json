@@ -132,5 +132,19 @@
     "mode": "source",
     "quality": 86,
     "media_id": "17888882949500813"
+  },
+  {
+    "date": "2026-11-13",
+    "topic": "AI agents versus chatbots",
+    "category": "practical_ai_tutorials",
+    "hook": "Nobody tells you why a chatbot stays stuck.",
+    "format": "short",
+    "hook_mechanism": "hidden truth",
+    "cta_type": "question",
+    "words": 112,
+    "source_url": null,
+    "mode": "explainer",
+    "quality": 83,
+    "media_id": "18078454064749431"
   }
 ]
