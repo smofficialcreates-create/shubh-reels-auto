@@ -118,5 +118,19 @@
     "mode": "source",
     "quality": 79,
     "media_id": "18436428403150407"
+  },
+  {
+    "date": "2026-11-13",
+    "topic": "AI creator outreach",
+    "category": "myths_vs_reality",
+    "hook": "Nobody tells you how outreach actually takes hours.",
+    "format": "short",
+    "hook_mechanism": "hidden truth",
+    "cta_type": "question",
+    "words": 103,
+    "source_url": "https://techcrunch.com/2026/11/12/nectar-launches-an-ai-agent-to-automate-creator-discovery-and-outreach-for-brands/",
+    "mode": "source",
+    "quality": 86,
+    "media_id": "17888882949500813"
   }
 ]
