@@ -55,7 +55,7 @@ HARD_RULES = """HARD RULES
 SOURCE_RULES = """GROUNDING (this reel is based on a real article, given below as SOURCE)
 - Use ONLY facts stated in the SOURCE. Do not add anything from memory: no extra numbers, features, names, dates or results. The analogy is a teaching picture, not a fact, and may be your own.
 - Separate fact from opinion. Do not present predictions or claims of a company as established truth: attribute them ("the company says").
-- "evidence": for at least three body sentences that state something from the article, give the sentence number (1-based) and a quote of 6 to 25 words copied EXACTLY, character for character, from the SOURCE. Quotes are machine-checked; a wrong quote fails the whole script.
+- "evidence": for at least two body sentences that state something from the article, give the sentence number (1-based) and a quote of 6 to 25 words copied EXACTLY, character for character, from the SOURCE. Quotes are machine-checked; a wrong quote fails the whole script.
 - A number may appear in the script only if it appears in the SOURCE.
 - Turn the idea into stages the viewer can use with any general AI assistant or on their own."""
 
@@ -109,8 +109,37 @@ You receive the script, a mode, and when present the SOURCE article. Score hones
  visuals /10 (the scene visuals show the idea accurately and fit the sentences they sit on)
  originality /5
 Also list "unsupported_claims": any statement that is wrong, overstated, contested, or (source mode) not backed by the SOURCE. Standard textbook definitions are not unsupported.
+FORMAT "short" (about 35 seconds): judge depth as one clear mechanism, one concrete demo and one limit; do NOT reject it for having fewer than three stages. Reject a short reel whose closing line is not a question or whose demo is not useful tomorrow.
 Reject for: medical, legal or financial advice; income promises; politics, religion, alcohol, tobacco, drugs; disparaging a person or company; pricing or free claims; fewer than three stages; padding; a visual that contradicts the sentence.
 Reply with JSON only: {"hook": 0, "accuracy": 0, "depth": 0, "clarity": 0, "retention": 0, "visuals": 0, "originality": 0, "unsupported_claims": [], "problems": []}"""
+
+SHORT_STRUCTURE = """SHAPE of the reel (about 35 seconds, 70 to 100 spoken words in hook + body + closing line). ONE idea, one mechanism, no recap.
+1. HOOK (first words spoken, see THE HOOK).
+2. PAYOFF AT ONCE: the first body sentence starts answering the hook. No greeting, no setup.
+3. THE PROBLEM, in one or two sentences, in the viewer's own words.
+4. THE DEMO: a weak prompt or approach, then the better one, shown on screen as a "chat" visual and read aloud ("Instead of X, ask Y").
+5. THE REASON it works, one sentence.
+6. CLOSING LINE: ONE question the viewer can answer in a comment (not "save" and not "follow").
+The viewer must be able to use it tomorrow with a free general AI assistant or on paper. Audience: students and early-career people who do NOT code. Skip developer-only tools and topics (code, repositories, servers, APIs)."""
+
+SHORT_RULES = """HARD RULES (short reel)
+- Spoken text only: no emojis, no hashtags, no links, no stage directions, no em dashes, NO DIGITS (numbers as words).
+- Never include: prices, plans, "free" claims, version numbers, percentages, income or money claims, guarantees, or anything about politics, religion, health, law, investing, alcohol, tobacco or drugs.
+- Every sentence at most 18 words. Hook + body + closing line: 70 to 100 words in total. Body of 5 to 8 sentences.
+- Do NOT write a greeting, a name, "I'm Shubh" or a follow request: the brand line is added automatically at the end.
+- The closing line is exactly one direct question for the comments, tied to the content."""
+
+SHORT_VISUALS = """SCENES: split the body sentences into 3 to 5 scenes of 1-3 consecutive sentences each, ONE on-screen visual each. Use at least two different types, never the same type twice in a row, and ALWAYS exactly one "chat" scene for the demo (weak prompt then better prompt, or the question and the answer).
+Types: {"type":"chat","prompt":"at most 14 words","result":"at most 22 words"}
+ {"type":"compare","left":{"title":"the weak way","rows":["2-3 short rows"]},"right":{"title":"the better way","rows":["2-3 short rows"]}}
+ {"type":"definition","term":"1-3 words","meaning":"at most 14 words"}
+ {"type":"flow","nodes":["3 to 4 labels"],"sync":[sentence numbers]}   {"type":"checklist","labels":["3 short items"],"sync":[sentence numbers]}
+ {"type":"keyword","word":"one word spoken in the scene"}
+Each scene: {"from": <first sentence>, "to": <last sentence>, "label": "2-3 word label", "visual": {...}}. Scenes cover sentences 1 to N in order."""
+
+SHORT_SCHEMA = SCHEMA.replace("11 to 17 body sentences following the SHAPE", "5 to 8 body sentences following the SHAPE") \
+    .replace('"cta": "the closing line",', '"cta": "ONE question for the comments",\n "first_comment": "a one-line prompt (at most 120 characters, no digits, no links) the account posts as the first comment to start a conversation",') \
+    .replace('"cta_type": "save | send | question"', '"cta_type": "question"')
 
 PASS_TOTAL = 76          # normal bar
 FALLBACK_TOTAL = 70      # last resort, only after every plan failed; accuracy and claim checks still apply
@@ -119,6 +148,8 @@ _NEAR: list = []         # scripts that passed every hard check but missed the q
 PASS_ACCURACY = 16
 PASS_DEPTH = 12
 MIN_WORDS = 140
+SHORT_WORDS = (70, 105)
+SHORT_DEPTH = 10
 VISUAL_TYPES = ("definition", "flow", "layers", "compare", "numeral", "counter", "checklist", "chat", "keyword")
 
 
@@ -208,12 +239,26 @@ def finalize(raw: dict, plan: dict | None = None) -> dict:
         "emphasis": emph,
         "evidence": [e for e in raw.get("evidence", []) if isinstance(e, dict)],
         "opinions": [clean_text(str(o), lex) for o in raw.get("opinions", [])][:6],
+        "first_comment": first_comment(raw.get("first_comment"), lex),
         "cta_type": raw.get("cta_type", ""),
         "cta": cta,
         "cover_text": cover,
         "caption": cap,
         "hashtags": [("#" + re.sub(r"[^A-Za-z0-9]", "", h)) for h in raw.get("hashtags", [])][:5],
     }
+
+
+COMMENT_PROMPTS = ["Which one will you try first? Tell me below.", "What would you ask an AI first? Write it below.",
+                   "Did you know this already? Yes or no below.", "What is your biggest struggle with this? Tell me below.",
+                   "Want a part two? Comment your topic below.", "Which tip surprised you most? Tell me below."]
+
+
+def first_comment(text, lex=None, seed: int = 0) -> str:
+    """The comment the account posts under its own reel. Safe fallback if the model's one is unusable."""
+    t = re.sub(r"\s+", " ", clean_text(str(text or ""), lex)) if lex else str(text or "").strip()
+    if not t or len(t) > 120 or re.search(r"\d|https?:|@|#", t) or safety.check_text("comment", t):
+        return COMMENT_PROMPTS[seed % len(COMMENT_PROMPTS)]
+    return t
 
 
 def _txt(v, n_words: int, lex) -> str:
@@ -272,14 +317,16 @@ def finalize_scenes(raw, body: list[str], lex) -> list[dict]:
     return out
 
 
-def scene_issues(script: dict) -> list[str]:
+def scene_issues(script: dict, short: bool = False) -> list[str]:
     sc = script.get("scenes") or []
     issues = []
-    if len(sc) < 4:
-        issues.append(f"only {len(sc)} usable scenes (need at least 4)")
+    if len(sc) < (3 if short else 4):
+        issues.append(f"only {len(sc)} usable scenes (need at least {3 if short else 4})")
     types = [x["visual"]["type"] for x in sc]
-    if len(set(types)) < 3:
-        issues.append("scenes use fewer than three different visual types")
+    if len(set(types)) < (2 if short else 3):
+        issues.append(f"scenes use too few different visual types")
+    if short and "chat" not in types:
+        issues.append("short reel needs an on-screen chat demo scene")
     if any(a == b for a, b in zip(types, types[1:])):
         issues.append("two neighbouring scenes use the same visual type")
     for x in sc:
@@ -288,7 +335,7 @@ def scene_issues(script: dict) -> list[str]:
 
 
 # ------------------------------------------------------------------------------ plans
-def build_plans(cfg: Config, history: list[dict], today: dt.date, log: dict) -> list[dict]:
+def build_plans(cfg: Config, history: list[dict], today: dt.date, log: dict, fmt: str = "long") -> list[dict]:
     """Source-grounded plans first (best story with a readable article), evergreen last."""
     plans: list[dict] = []
     try:
@@ -305,16 +352,18 @@ def build_plans(cfg: Config, history: list[dict], today: dt.date, log: dict) -> 
         if not art:
             continue
         plans.append({"mode": "source", "cand": r["candidate"], "category": r["category"], "angle": r["angle"],
-                      "scores": r["scores"], "total": r["total"], "excerpt": art["text"]})
+                      "scores": r["scores"], "total": r["total"], "excerpt": art["text"], "fmt": fmt})
         if len(plans) == 3:
             break
     entry = pick_explainer(history, today)
     plans.append({"mode": "explainer", "entry": entry, "pillar": entry["category"], "seed": entry["title"],
-                  "category": entry["category"]})
+                  "category": entry["category"], "fmt": fmt})
     return plans
 
 
 def writer_prompt(plan: dict, history: list[dict], problems: list[str], today: dt.date) -> tuple[str, str]:
+    short = plan.get("fmt") == "short"
+    S, R, V, SC = (SHORT_STRUCTURE, SHORT_RULES, SHORT_VISUALS, SHORT_SCHEMA) if short else (STRUCTURE, HARD_RULES, VISUALS, SCHEMA)
     past_topics = [h.get("topic", "") for h in history][-40:]
     past_hooks = [h.get("hook", "") for h in history][-12:]
     avoid = (f"Topics already covered (do not repeat): {json.dumps(past_topics)}\n"
@@ -322,13 +371,13 @@ def writer_prompt(plan: dict, history: list[dict], problems: list[str], today: d
     fix = f"Fix these problems from the last attempt: {problems[-6:]}\n" if problems else ""
     if plan["mode"] == "source":
         c = plan["cand"]
-        system = "\n\n".join([PERSONA, STRUCTURE, HOOKS, SOURCE_RULES, VISUALS, HARD_RULES, SCHEMA])
+        system = "\n\n".join([PERSONA, S, HOOKS, SOURCE_RULES, V, R, SC])
         user = (f"Today: {today.isoformat()}\nCategory to use: {plan['category']}\nAngle: {plan['angle']}\n"
                 f"SOURCE title: {c.title}\nSOURCE publisher: {c.publisher} (published {c.published})\n"
                 f"SOURCE text:\n\"\"\"\n{plan['excerpt']}\n\"\"\"\n{avoid}{fix}")
     else:
         e = plan["entry"]
-        system = "\n\n".join([PERSONA, STRUCTURE, HOOKS, EXPLAINER_RULES, VISUALS, HARD_RULES, SCHEMA])
+        system = "\n\n".join([PERSONA, S, HOOKS, EXPLAINER_RULES, V, R, SC])
         user = (f"Today: {today.isoformat()}\nCategory to use: {plan['category']}\nTOPIC: {e['title']}\n"
                 f"OUTLINE\n- analogy to use: {e['analogy']}\n- stages: {json.dumps(e['stages'])}\n- the catch: {e['catch']}\n"
                 f"{avoid}{fix}")
@@ -355,20 +404,27 @@ def attempt(cfg: Config, plan: dict, history: list[dict], problems: list[str], t
     dup = safety.too_similar(script["topic"], past)
     if dup:
         issues.append(f"too similar to an earlier topic: {dup}")
+    short = plan.get("fmt") == "short"
+    script["format"] = "short" if short else "long"
     words = sum(len(x.split()) for x in [script["hook"]] + script["sentences"] + [script["cta"]])
-    if words < MIN_WORDS or len(script["sentences"]) < 9:
+    if short:
+        if not (SHORT_WORDS[0] <= words <= SHORT_WORDS[1]):
+            issues.append(f"{words} words; a short reel needs {SHORT_WORDS[0]} to {SHORT_WORDS[1]}")
+        if not script["cta"].rstrip().endswith("?"):
+            issues.append("closing line must be a question for the comments")
+    elif words < MIN_WORDS or len(script["sentences"]) < 9:
         issues.append(f"too thin for a deep explainer: {words} words, {len(script['sentences'])} sentences (need {MIN_WORDS}+ words, 9+ sentences)")
-    issues += scene_issues(script)
+    issues += scene_issues(script, short)
     if script["hook_score"] < HOOK_FLOOR:
         issues.append(f"best hook only scores {script['hook_score']} (need {HOOK_FLOOR}+)")
     verified = []
     if source:
-        verified, g_issues = grounding.verify(script, plan["excerpt"])
+        verified, g_issues = grounding.verify(script, plan["excerpt"], min_quotes=1 if short else 2)
         issues += g_issues
     if issues:
         return None, issues
     review_input = {"script": {k: script[k] for k in ("hook", "sentences", "cta", "takeaway", "scenes", "opinions")},
-                    "mode": plan["mode"]}
+                    "mode": plan["mode"], "format": "short" if short else "long"}
     if source:
         review_input["SOURCE"] = plan["excerpt"]
         review_input["verified_evidence"] = verified
@@ -377,15 +433,16 @@ def attempt(cfg: Config, plan: dict, history: list[dict], problems: list[str], t
     except Exception as e:  # noqa: BLE001 - reviewer unavailable: fail closed
         return None, [f"reviewer unavailable ({type(e).__name__})"]
     total, parts = rubric_total(review)
+    min_depth = SHORT_DEPTH if short else PASS_DEPTH
     problems_r = [str(p) for p in review.get("problems", [])][:4] + \
                  [f"unsupported: {u}" for u in review.get("unsupported_claims", [])][:4]
     if review.get("unsupported_claims"):
         return None, problems_r or ["unsupported claims"]
-    if total < PASS_TOTAL and total >= FALLBACK_TOTAL and parts["accuracy"] >= PASS_ACCURACY and parts["depth"] >= PASS_DEPTH:
+    if total < PASS_TOTAL and total >= FALLBACK_TOTAL and parts["accuracy"] >= PASS_ACCURACY and parts["depth"] >= min_depth:
         script["quality"] = {"total": total, **parts}
         script["evidence_verified"] = verified
         _NEAR.append((total, script, plan))
-    if total < PASS_TOTAL or parts["accuracy"] < PASS_ACCURACY or parts["depth"] < PASS_DEPTH:
+    if total < PASS_TOTAL or parts["accuracy"] < PASS_ACCURACY or parts["depth"] < min_depth:
         return None, [f"quality {total}/100 (hook {parts['hook']}, accuracy {parts['accuracy']}, depth {parts['depth']}, "
                       f"clarity {parts['clarity']}) is below the bar of {PASS_TOTAL}"] + problems_r
     script["quality"] = {"total": total, **parts}
@@ -406,13 +463,15 @@ def finish(script: dict, plan: dict, log: dict) -> dict:
     return script
 
 
-def backup_script(history: list[dict], today: dt.date) -> dict:
+def backup_script(history: list[dict], today: dt.date, fmt: str = "long") -> dict:
     """Last resort so a day is never skipped: a hand-written lesson from data/backup_scripts.json.
     Every entry is checked by the same safety rules at load time. Unused ones go first; once all
     have been used, the one used longest ago comes round again."""
     path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "backup_scripts.json")
     bank = json.load(open(path, encoding="utf-8"))
     ok = [b for b in bank if not safety.check_script(b)]
+    if fmt == "short":                       # short reels use the hand-written short lessons (no deep scenes)
+        ok = [b for b in ok if not b.get("scenes")] or ok
     if not ok:
         raise RuntimeError("backup bank is empty or failed the safety checks")
     last = {}
@@ -421,6 +480,8 @@ def backup_script(history: list[dict], today: dt.date) -> dict:
     ok.sort(key=lambda b: last.get(b["topic"], -1))
     script = json.loads(json.dumps(ok[0]))
     script["mode"] = "backup"
+    script["format"] = "long" if script.get("scenes") else "short"
+    script["first_comment"] = script.get("first_comment") or COMMENT_PROMPTS[today.toordinal() % len(COMMENT_PROMPTS)]
     script["pillar"] = script["category"]
     script["quality"] = {"total": None, "note": "pre-checked backup lesson"}
     script["evidence_verified"] = []
@@ -429,15 +490,25 @@ def backup_script(history: list[dict], today: dt.date) -> dict:
     return script
 
 
+def pick_format(cfg: Config, today: dt.date) -> str:
+    f = (cfg.reel_format or "short").lower()
+    if f == "alternate":
+        return "short" if today.toordinal() % 2 else "long"
+    return "long" if f == "long" else "short"
+
+
 def generate(cfg: Config, history: list[dict], today: dt.date | None = None) -> dict:
     today = today or dt.date.today()
     log: dict = {"date": today.isoformat()}
+    fmt = pick_format(cfg, today)
+    log["format"] = fmt
     try:
-        plans = build_plans(cfg, history, today, log)
+        plans = build_plans(cfg, history, today, log, fmt)
     except Exception as e:  # noqa: BLE001 - research or AI outage must not stop the daily post
         print(f"[plans] failed: {type(e).__name__}: {str(e)[:120]}", file=sys.stderr)
         plans = []
     for plan in plans:
+        plan.setdefault("fmt", fmt)
         tries = 3
         problems: list[str] = []
         label = plan["cand"].title if plan["mode"] == "source" else plan["seed"]
@@ -453,7 +524,7 @@ def generate(cfg: Config, history: list[dict], today: dt.date | None = None) -> 
         print(f"using best near-miss script ({total}/100): every safety and accuracy check passed", file=sys.stderr)
         return finish(script, plan, log)
     print("no live script passed; using a pre-checked backup lesson", file=sys.stderr)
-    return backup_script(history, today)
+    return backup_script(history, today, fmt)
 
 
 def fact_check(script: dict) -> list[dict]:
@@ -474,5 +545,7 @@ def build_caption(script: dict) -> str:
     if src and "source:" not in cap.lower():
         cap = cap.replace("AI-generated video.", f"Source: {src['publisher']}\nAI-generated video.") \
             if "AI-generated video." in cap else cap + f"\nSource: {src['publisher']}"
+    if script.get("format") == "short" and script.get("first_comment") and "?" not in cap:
+        cap = cap.replace("AI-generated video.", f"{script['cta']}\nAI-generated video.") if "AI-generated video." in cap else cap
     tags = " ".join(script["hashtags"][:5])
     return f"{cap}\n\n{tags}".strip()

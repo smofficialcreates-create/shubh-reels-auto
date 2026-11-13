@@ -130,3 +130,16 @@ def refresh_token(token: str) -> str:
                      params={"grant_type": "ig_refresh_token", "access_token": token})
     data = _check(r, "token refresh")
     return data["access_token"]
+
+
+def post_comment(cfg: Config, media_id: str, text: str) -> str | None:
+    """First comment under our own reel, to start a conversation. Never fails the run."""
+    try:
+        r = requests.post(_graph(cfg, f"{media_id}/comments"), headers={"Authorization": f"Bearer {cfg.ig_token}"},
+                          timeout=30, data={"message": text})
+        cid = _check(r, "first comment")["id"]
+        print("first comment posted (pin it by hand: tap and hold the comment, then Pin)")
+        return cid
+    except Exception as e:  # noqa: BLE001
+        print(f"first comment skipped: {type(e).__name__}: {str(e)[:160]}")
+        return None

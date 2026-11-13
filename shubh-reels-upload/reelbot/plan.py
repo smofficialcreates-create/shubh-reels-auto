@@ -120,7 +120,7 @@ def repair_scenes(scenes: list[dict], n: int) -> list[dict]:
 def build_sections(script: dict, nar) -> list[Section]:
     from . import brand
     o = brand.offset(script)                            # 1 when the Shubh intro is spoken first
-    outro = 1 if o else 0
+    outro = 1 if brand.has_outro(script) else 0
     n_body = len(script["sentences"])
     last = n_body + 1                                   # cta index
     text_all = [script["hook"]] + script["sentences"] + [script["cta"]]

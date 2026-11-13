@@ -158,7 +158,7 @@ class Fallback(unittest.TestCase):
         seq = iter([DEEP, low] * 9)
         with mock.patch("reelbot.script_gen.build_plans", return_value=[explainer_plan()]), \
              mock.patch("reelbot.llm.chat_json", side_effect=lambda *a, **k: next(seq)):
-            out = script_gen.generate(Config(), [], dt.date(2026, 10, 30))
+            out = script_gen.generate(Config(reel_format="long"), [], dt.date(2026, 10, 30))
         self.assertEqual(out["mode"], "explainer")
         self.assertEqual(out["quality"]["total"], 72)
 
@@ -168,7 +168,7 @@ class Fallback(unittest.TestCase):
         seq = iter([DEEP, bad] * 9)
         with mock.patch("reelbot.script_gen.build_plans", return_value=[explainer_plan()]), \
              mock.patch("reelbot.llm.chat_json", side_effect=lambda *a, **k: next(seq)):
-            out = script_gen.generate(Config(), [], dt.date(2026, 10, 30))
+            out = script_gen.generate(Config(reel_format="long"), [], dt.date(2026, 10, 30))
         self.assertEqual(out["mode"], "backup")   # a 55/100 live script is never used
 
 
@@ -185,8 +185,8 @@ class Backup(unittest.TestCase):
     def test_total_ai_outage_still_gives_a_script_and_rotates(self):
         script_gen._NEAR.clear()
         with mock.patch("reelbot.script_gen.build_plans", side_effect=RuntimeError("boom")):
-            a = script_gen.generate(Config(), [], dt.date(2026, 11, 3))
-            b = script_gen.generate(Config(), [{"topic": a["topic"]}], dt.date(2026, 11, 4))
+            a = script_gen.generate(Config(reel_format="long"), [], dt.date(2026, 11, 3))
+            b = script_gen.generate(Config(reel_format="long"), [{"topic": a["topic"]}], dt.date(2026, 11, 4))
         self.assertEqual(a["mode"], "backup")
         self.assertNotEqual(a["topic"], b["topic"])
 
@@ -194,7 +194,7 @@ class Backup(unittest.TestCase):
         script_gen._NEAR.clear()
         with mock.patch("reelbot.script_gen.build_plans", return_value=[explainer_plan()]), \
              mock.patch("reelbot.llm.chat_json", side_effect=RuntimeError("down")):
-            self.assertEqual(script_gen.generate(Config(), [], dt.date(2026, 11, 3))["mode"], "backup")
+            self.assertEqual(script_gen.generate(Config(reel_format="long"), [], dt.date(2026, 11, 3))["mode"], "backup")
 
 
 class Order(unittest.TestCase):
@@ -246,3 +246,90 @@ class Research(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+SHORT = {
+    "topic": "Ask AI for the question behind your question", "category": "practical_ai_tutorials", "tag": "AI TIP",
+    "hook_options": ["You are asking your assistant the wrong question.", "Your first prompt is rarely the real one.",
+                     "Why does your assistant give vague answers?"],
+    "hook_mechanisms": ["wrong way", "hidden truth", "challenge"], "hook_focus": "wrong",
+    "sentences": [
+        "Most people type the first question that comes to mind.",
+        "That question is usually a rough guess at what they really need.",
+        "So the assistant gives a rough guess back.",
+        "Try this instead: ask it what question you should be asking.",
+        "It will list a few sharper questions and why each one matters.",
+        "Pick the best one and ask that, and the answer gets specific."],
+    "scenes": [
+        {"from": 1, "to": 3, "label": "the problem", "visual": {"type": "compare",
+            "left": {"title": "weak way", "rows": ["first thought", "vague answer"]},
+            "right": {"title": "better way", "rows": ["sharper question", "specific answer"]}}},
+        {"from": 4, "to": 5, "label": "the demo", "visual": {"type": "chat", "prompt": "What question should I really be asking about my career switch?",
+            "result": "Ask which skills transfer, which gaps matter most, and who hires for both."}},
+        {"from": 6, "to": 6, "label": "the rule", "visual": {"type": "keyword", "word": "specific"}}],
+    "takeaway": "Ask for the better question first.", "emphasis": ["question", "guess", "guess", "ask", "sharper", "specific", "tomorrow"],
+    "evidence": [], "opinions": [], "cta_type": "question",
+    "cta": "What would you ask your assistant first tomorrow?",
+    "first_comment": "Which question would you sharpen first? Tell me below.",
+    "cover_text": "Ask the better question first", "caption": "You are asking the wrong question.\nAsk for the better question first.\nai prompts, productivity\nAI-generated video.",
+    "hashtags": ["#aitools", "#productivity", "#prompts"]}
+SHORT_REVIEW = dict(GOOD, depth=12)
+
+
+def short_plan():
+    return dict(explainer_plan(), fmt="short")
+
+
+class ShortMode(unittest.TestCase):
+    def test_short_script_passes_and_is_marked_short(self):
+        script, issues = run_attempt(SHORT, SHORT_REVIEW, short_plan())
+        self.assertEqual(issues, [])
+        self.assertEqual(script["format"], "short")
+        self.assertTrue(script["first_comment"].endswith("below."))
+
+    def test_short_needs_chat_demo_and_closing_question(self):
+        no_chat = dict(SHORT, scenes=[s for s in SHORT["scenes"] if s["visual"]["type"] != "chat"] + [
+            {"from": 4, "to": 5, "label": "x", "visual": {"type": "definition", "term": "Sharper", "meaning": "a question with a clear goal"}}])
+        _s, issues = run_attempt(no_chat, SHORT_REVIEW, short_plan())
+        self.assertTrue(any("chat" in i for i in issues))
+        _s, issues = run_attempt(dict(SHORT, cta="Save this for later."), SHORT_REVIEW, short_plan())
+        self.assertTrue(any("question" in i for i in issues))
+
+    def test_deep_script_is_rejected_in_short_mode(self):
+        _s, issues = run_attempt(DEEP, GOOD, short_plan())
+        self.assertTrue(any("short reel needs" in i for i in issues))
+
+    def test_name_comes_last_in_short_reels(self):
+        from reelbot import brand
+        script, _ = run_attempt(SHORT, SHORT_REVIEW, short_plan())
+        lines = brand.spoken(script)
+        self.assertEqual(lines[0], script["hook"])
+        self.assertEqual(lines[1], script["sentences"][0])        # payoff straight after the hook
+        self.assertEqual(lines[-1], brand.OUTRO_SHORT)
+        self.assertNotIn(brand.INTRO, lines)
+        self.assertEqual(brand.offset(script), 0)
+
+    def test_sections_cover_a_short_reel(self):
+        from reelbot import brand, tts
+        script, _ = run_attempt(SHORT, SHORT_REVIEW, short_plan())
+        nar = tts.synth_fake(brand.spoken(script))
+        secs = planner.build_sections(script, nar)
+        self.assertEqual(secs[0].kind, "hook")
+        self.assertNotIn("intro", [s.kind for s in secs])
+        self.assertEqual(secs[-1].kind, "cta")
+        self.assertEqual(secs[-1].i1, len(script["sentences"]) + 2)
+
+    def test_format_selection_and_backup(self):
+        d = dt.date(2026, 11, 14)
+        self.assertEqual(script_gen.pick_format(Config(reel_format="long"), d), "long")
+        self.assertEqual(script_gen.pick_format(Config(reel_format="short"), d), "short")
+        self.assertEqual({script_gen.pick_format(Config(reel_format="alternate"), d),
+                          script_gen.pick_format(Config(reel_format="alternate"), d + dt.timedelta(days=1))}, {"short", "long"})
+        b = script_gen.backup_script([], d, "short")
+        self.assertEqual(b["format"], "short")
+        self.assertTrue(b["first_comment"])
+
+    def test_first_comment_never_breaks_the_run(self):
+        from reelbot import publish
+        with mock.patch("reelbot.publish.requests.post", side_effect=RuntimeError("down")):
+            self.assertIsNone(publish.post_comment(Config(), "123", "hello"))

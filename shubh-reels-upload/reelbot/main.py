@@ -47,9 +47,10 @@ def main(argv=None) -> int:
     nar = tts.synth_fake(texts) if args.fake_tts else tts.synth_voice(texts, cfg.voice, cfg.speed, cfg.model_dir)
     total = len(nar.audio) / nar.sr
     print(f"voice: {total:.1f}s")
-    if total > 85 and not args.sample:
-        print(f"narration is {total:.0f}s, longer than 85s; switching to a backup lesson so today still posts")
-        script = script_gen.backup_script(history, dt.date.today())
+    limit = 55 if script.get("format") == "short" else 85
+    if total > limit and not args.sample:
+        print(f"narration is {total:.0f}s, longer than {limit}s; switching to a backup lesson so today still posts")
+        script = script_gen.backup_script(history, dt.date.today(), script.get("format") or "long")
         json.dump(script, open(os.path.join(args.out_dir, "script.json"), "w"), indent=2)
         texts = brand.spoken(script)
         nar = tts.synth_fake(texts) if args.fake_tts else tts.synth_voice(texts, cfg.voice, cfg.speed, cfg.model_dir)
@@ -82,8 +83,12 @@ def main(argv=None) -> int:
     urls = publish.push_media(cfg, video, cover_path)
     result = publish.publish_reel(cfg, urls["video"], caption, urls["cover"])
     print("published:", result)
+    if script.get("first_comment"):
+        publish.post_comment(cfg, result["id"], script["first_comment"])
     history.append({"date": dt.date.today().isoformat(), "topic": script["topic"], "category": script.get("category"),
-                    "hook": script["hook"], "source_url": (script.get("source") or {}).get("url"),
+                    "hook": script["hook"], "format": script.get("format"), "hook_mechanism": script.get("hook_mechanism"),
+                    "cta_type": script.get("cta_type"), "words": len(" ".join(brand.spoken(script)).split()),
+                    "source_url": (script.get("source") or {}).get("url"),
                     "mode": script.get("mode"), "quality": (script.get("quality") or {}).get("total"),
                     "media_id": result["id"]})
     json.dump(history[-200:], open("data/history.json", "w"), indent=2)
