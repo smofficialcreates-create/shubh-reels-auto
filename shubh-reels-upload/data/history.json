@@ -146,5 +146,19 @@
     "mode": "explainer",
     "quality": 83,
     "media_id": "18078454064749431"
+  },
+  {
+    "date": "2026-11-14",
+    "topic": "Deep work versus shallow work",
+    "category": "productivity_methods",
+    "hook": "Nobody tells you why constant tasks stall progress.",
+    "format": "short",
+    "hook_mechanism": "hidden truth",
+    "cta_type": "question",
+    "words": 111,
+    "source_url": null,
+    "mode": "explainer",
+    "quality": 81,
+    "media_id": "17949766917072274"
   }
 ]
