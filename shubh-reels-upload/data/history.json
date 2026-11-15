@@ -160,5 +160,22 @@
     "mode": "explainer",
     "quality": 81,
     "media_id": "17949766917072274"
+  },
+  {
+    "date": "2026-11-15",
+    "topic": "The STAR method for interview answers",
+    "category": "career_skills",
+    "hook": "Nobody tells you why interview stories fall flat.",
+    "format": "short",
+    "hook_mechanism": "nobody mentions",
+    "cta_type": "question",
+    "words": 108,
+    "source_url": null,
+    "mode": "explainer",
+    "quality": 80,
+    "series": "CAREER MOVE",
+    "episode": 1,
+    "posted_at": "2026-11-15T19:27+05:30",
+    "media_id": "18122105683981125"
   }
 ]

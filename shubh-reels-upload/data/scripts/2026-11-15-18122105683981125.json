@@ -1,0 +1,90 @@
+{
+ "topic": "The STAR method for interview answers",
+ "category": "career_skills",
+ "series": "CAREER MOVE",
+ "episode": 1,
+ "format": "short",
+ "hook": "Nobody tells you why interview stories fall flat.",
+ "hook_focus": "flat",
+ "hook_mechanism": "nobody mentions",
+ "sentences": [
+  "Most stories lose the listener because they spend all their time on the action.",
+  "Imagine telling a long tale about a project without ever mentioning the payoff.",
+  "Instead of rambling, structure your reply around four clear parts.",
+  "Start with the situation to set the scene briefly.",
+  "Name the task you were personally responsible for next.",
+  "Describe the action you took and why you chose it.",
+  "Finish with the result to show exactly what changed because of your work."
+ ],
+ "scenes": [
+  {
+   "from": 1,
+   "to": 2,
+   "label": "the problem",
+   "visual": {
+    "type": "compare",
+    "left": {
+     "title": "the weak way",
+     "rows": [
+      "all action",
+      "no clear end"
+     ]
+    },
+    "right": {
+     "title": "the better way",
+     "rows": [
+      "clear stages",
+      "strong result"
+     ]
+    }
+   }
+  },
+  {
+   "from": 3,
+   "to": 4,
+   "label": "demo example",
+   "visual": {
+    "type": "chat",
+    "prompt": "Tell me about a time you solved a problem.",
+    "result": "Set the scene briefly with the situation."
+   }
+  },
+  {
+   "from": 5,
+   "to": 7,
+   "label": "four stages",
+   "visual": {
+    "type": "checklist",
+    "labels": [
+     "situation",
+     "task",
+     "action",
+     "result"
+    ],
+    "sync": [
+     5,
+     6,
+     7
+    ]
+   }
+  }
+ ],
+ "cta": "Which part of a project story is hardest for you to explain?",
+ "takeaway": "Structure interview stories using the four stages of situation, task, action, and result.",
+ "caption": "Nobody tells you why interview stories fall flat. Structure your answers with clear stages. Career advice, interview prep, job search, communication skills. AI-generated video.",
+ "first_comment": "Drop your favorite project example below and test it out.",
+ "cover_text": "How to structure your interview stories",
+ "emphasis": [
+  "flat",
+  "listener",
+  "payoff",
+  "parts",
+  "scene",
+  "task",
+  "action",
+  "result",
+  "story"
+ ],
+ "media_id": "18122105683981125",
+ "date": "2026-11-15"
+}
