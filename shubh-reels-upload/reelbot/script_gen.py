@@ -20,6 +20,7 @@ import sys
 from vendor.ig_skill import hookscore, humanize
 
 from . import grounding, llm, research, safety, series, topic
+from . import engage
 from .config import Config
 
 PERSONA = """You write the voice of SHUBH, an animated narrator: an intelligent friend who has just found something fascinating and wants you to have it too.
@@ -45,7 +46,8 @@ Write three options, each from a different pattern, fitted to THIS reel's conten
  5. DIRECT QUESTION or CHALLENGE aimed at the viewer ("Can you explain how your assistant answers you?")
  6. NOBODY MENTIONS THIS: an open secret nobody spells out ("Nobody mentions this about AI prompts.", "Nobody tells you this about your to do list.")
  7. JUST FIGURED IT OUT: a personal discovery ("I just figured out why my AI answers were vague.")
-At least one of the three options should use pattern 6 or 7, and they are preferred when they fit the content honestly.
+ 8. MILD OPINION: a bold but defensible take about a method or habit, never about people, groups, companies or politics ("Most AI advice is backwards.", "Stop asking AI for the answer.")
+At least one of the three options should use pattern 6, 7 or 8, and they are preferred when they fit the content honestly. A mild opinion must be something the reel then explains and supports.
 Rules: 5 to 12 words, spoken to "you", concrete, no numbers, no hype words (amazing, insane, mind-blowing, secret hack), and it must be fully answered by the reel: the first body sentence starts paying it off at once. Never promise anything the reel does not deliver."""
 
 HARD_RULES = """HARD RULES
@@ -86,7 +88,7 @@ SCHEMA = """OUTPUT: one JSON object with exactly these keys
  "category": "one of: %s",
  "tag": "2-3 word on-screen label in caps, e.g. AI EXPLAINED",
  "hook_options": ["three hooks from three different patterns in THE HOOK, 5-12 words each, aimed at 'you', true to the content"],
- "hook_mechanisms": ["wrong way | costly mistake | hidden truth | reversal | challenge | nobody mentions | just figured out"],
+ "hook_mechanisms": ["wrong way | costly mistake | hidden truth | reversal | challenge | nobody mentions | just figured out | opinion"],
  "hook_focus": "the single most striking word of your best hook",
  "sentences": ["11 to 17 body sentences following the SHAPE"],
  "scenes": [ ...see SCENES... ],
@@ -112,7 +114,7 @@ You receive the script, a mode, and when present the SOURCE article. Score hones
  visuals /10 (the scene visuals show the idea accurately and fit the sentences they sit on)
  originality /5
 Also list "unsupported_claims": any statement that is wrong, overstated, contested, or (source mode) not backed by the SOURCE. Standard textbook definitions are not unsupported.
-FORMAT "short" (about 35 seconds): judge depth as one clear mechanism, one concrete demo and one limit; do NOT reject it for having fewer than three stages. Reject a short reel whose closing line is not a question or whose demo is not useful tomorrow.
+FORMAT "short" (about 35 seconds): judge depth as one clear mechanism, one concrete demo and one limit; do NOT reject it for having fewer than three stages. Reject a short reel whose closing line is only a request to save or follow, or whose demo is not useful tomorrow.
 Reject for: medical, legal or financial advice; income promises; politics, religion, alcohol, tobacco, drugs; disparaging a person or company; pricing or free claims; fewer than three stages; padding; a visual that contradicts the sentence.
 Reply with JSON only: {"hook": 0, "accuracy": 0, "depth": 0, "clarity": 0, "retention": 0, "visuals": 0, "originality": 0, "unsupported_claims": [], "problems": []}"""
 
@@ -122,7 +124,7 @@ SHORT_STRUCTURE = """SHAPE of the reel (about 35 seconds, 70 to 100 spoken words
 3. THE PROBLEM, in one or two sentences, in the viewer's own words.
 4. THE DEMO: a weak prompt or approach, then the better one, shown on screen as a "chat" visual and read aloud ("Instead of X, ask Y").
 5. THE REASON it works, one sentence.
-6. CLOSING LINE: ONE question the viewer can answer in a comment (not "save" and not "follow").
+6. CLOSING LINE: follows the CLOSING STYLE given in the task (a question, a pick-a-side, a fill-in, a rating, a share request or a keyword reward). Never "save this" and never "follow".
 The viewer must be able to use it tomorrow with a free general AI assistant or on paper. Audience: students and early-career people who do NOT code. Skip developer-only tools and topics (code, repositories, servers, APIs)."""
 
 SHORT_RULES = """HARD RULES (short reel)
@@ -130,7 +132,7 @@ SHORT_RULES = """HARD RULES (short reel)
 - Never include: prices, plans, "free" claims, version numbers, percentages, income or money claims, guarantees, or anything about politics, religion, health, law, investing, alcohol, tobacco or drugs.
 - Every sentence at most 18 words. Hook + body + closing line: 70 to 100 words in total. Body of 5 to 8 sentences.
 - Do NOT write a greeting, a name, "I'm Shubh" or a follow request: the brand line is added automatically at the end.
-- The closing line is exactly one direct question for the comments, tied to the content.
+- The closing line follows the CLOSING STYLE given in the task, tied to the content, one sentence, spoken, no digits (numbers as words).
 - "loop_line": 3 to 8 words, a lead-in clause that is spoken as the very last words and flows grammatically into the HOOK when the video restarts (for example "And that is exactly why" then the hook "Nobody mentions this."). No question mark, no digits."""
 
 SHORT_VISUALS = """SCENES: split the body sentences into 3 to 5 scenes of 1-3 consecutive sentences each, ONE on-screen visual each. Use at least two different types, never the same type twice in a row, and ALWAYS exactly one "chat" scene for the demo (weak prompt then better prompt, or the question and the answer).
@@ -143,7 +145,8 @@ Each scene: {"from": <first sentence>, "to": <last sentence>, "label": "2-3 word
 
 SHORT_SCHEMA = SCHEMA.replace("11 to 17 body sentences following the SHAPE", "5 to 8 body sentences following the SHAPE") \
     .replace('"cta": "the closing line",', '"cta": "ONE question for the comments",\n "first_comment": "a one-line prompt (at most 120 characters, no digits, no links) the account posts as the first comment to start a conversation",') \
-    .replace('"cta_type": "save | send | question"', '"cta_type": "question"') \
+    .replace('"cta_type": "save | send | question"', '"cta_type": "the CLOSING STYLE name"') \
+    .replace(' "cover_text"', ' "keyword": "ONLY for the keyword style: one of PROMPT, STEPS, GUIDE, CHECKLIST, TEMPLATE, else empty",\n "reward_text": "ONLY for the keyword style: the message sent to commenters, else empty",\n "cover_text"', 1) \
     .replace(' "cover_text"', ' "loop_line": "3 to 8 word lead-in that flows into the hook when the video restarts",\n "cover_text"', 1)
 
 PASS_TOTAL = 76          # normal bar
@@ -264,9 +267,14 @@ def finalize(raw: dict, plan: dict | None = None) -> dict:
         "emphasis": emph,
         "evidence": [e for e in raw.get("evidence", []) if isinstance(e, dict)],
         "opinions": [clean_text(str(o), lex) for o in raw.get("opinions", [])][:6],
-        "first_comment": first_comment(raw.get("first_comment"), lex),
+        "first_comment": (f"Comment {re.sub('[^A-Za-z]', '', str(raw.get('keyword') or '')).upper()} below and I will send it to you."
+                          if (plan or {}).get("cta_style") == "keyword" and raw.get("keyword") else first_comment(raw.get("first_comment"), lex)),
         "loop_line": loop_line(raw.get("loop_line"), lex),
-        "cta_type": raw.get("cta_type", ""),
+        "cta_type": plan.get("cta_style", "question") if plan else raw.get("cta_type", ""),
+        "cta_style": plan.get("cta_style", "question") if plan else "question",
+        "keyword": re.sub(r"[^A-Za-z]", "", str(raw.get("keyword") or "")).upper() if (plan or {}).get("cta_style") == "keyword" else "",
+        "reward_text": _reward(raw.get("reward_text")) if (plan or {}).get("cta_style") == "keyword" else "",
+        "teaser": (plan or {}).get("teaser") or "",
         "cta": cta,
         "cover_text": cover,
         "caption": cap,
@@ -278,6 +286,11 @@ FIXED_TAGS = "#fyp #doubletap #growthmindset #viral #reels #explorepage"      # 
 COMMENT_PROMPTS = ["Which one will you try first? Tell me below.", "What would you ask an AI first? Write it below.",
                    "Did you know this already? Yes or no below.", "What is your biggest struggle with this? Tell me below.",
                    "Want a part two? Comment your topic below.", "Which tip surprised you most? Tell me below."]
+
+
+def _reward(text) -> str:
+    t = re.sub(r"\s+", " ", str(text or "")).strip()
+    return re.sub(r"[\U00010000-\U0010ffff☀-➿]", "", t).replace("\u2014", ",")
 
 
 def loop_line(text, lex) -> str:
@@ -407,6 +420,11 @@ def writer_prompt(plan: dict, history: list[dict], problems: list[str], today: d
     if st and (st.get("prefer_hooks") or st.get("avoid_hooks")):
         fix += (f"Our own data ({st.get('sample_size')} reels): hook patterns that did best: {st.get('prefer_hooks') or 'unknown'}; "
                 f"weakest: {st.get('avoid_hooks') or 'none'}. Use a best pattern for at least one hook option.\n")
+    if short:
+        fix += engage.prompt_block(plan) + "\n"
+        if plan.get("promised"):
+            fix += (f'Yesterday\'s reel promised this topic for today: "{plan["promised"]}". Deliver exactly that topic. '
+                    'Do not mention tomorrow.\n')
     if plan["mode"] == "source":
         c = plan["cand"]
         system = "\n\n".join([PERSONA, S, HOOKS, SOURCE_RULES, V, R, SC])
@@ -448,8 +466,7 @@ def attempt(cfg: Config, plan: dict, history: list[dict], problems: list[str], t
     if short:
         if not (SHORT_WORDS[0] <= words <= SHORT_WORDS[1]):
             issues.append(f"{words} words; a short reel needs {SHORT_WORDS[0]} to {SHORT_WORDS[1]}")
-        if not script["cta"].rstrip().endswith("?"):
-            issues.append("closing line must be a question for the comments")
+        issues += engage.check_cta(plan.get("cta_style"), script["cta"], script)
     elif words < MIN_WORDS or len(script["sentences"]) < 9:
         issues.append(f"too thin for a deep explainer: {words} words, {len(script['sentences'])} sentences (need {MIN_WORDS}+ words, 9+ sentences)")
     issues += scene_issues(script, short)
@@ -521,6 +538,7 @@ def backup_script(history: list[dict], today: dt.date, fmt: str = "long") -> dic
     script = json.loads(json.dumps(ok[0]))
     script["mode"] = "backup"
     script["format"] = "long" if script.get("scenes") else "short"
+    script.setdefault("cta_style", "question")
     script["first_comment"] = script.get("first_comment") or COMMENT_PROMPTS[today.toordinal() % len(COMMENT_PROMPTS)]
     script["pillar"] = script["category"]
     script["quality"] = {"total": None, "note": "pre-checked backup lesson"}
@@ -550,8 +568,18 @@ def generate(cfg: Config, history: list[dict], today: dt.date | None = None) -> 
     except Exception as e:  # noqa: BLE001 - research or AI outage must not stop the daily post
         print(f"[plans] failed: {type(e).__name__}: {str(e)[:120]}", file=sys.stderr)
         plans = []
+    strategy = load_strategy()
+    eng = engage.plan_for(cfg, history, today, fmt, pick_explainer, strategy)
+    log["engagement"] = {k: eng[k] for k in ("cta_style", "teaser", "promised")}
+    promised = eng.get("promised") and engage.entry_by_title(eng["promised"])
+    if promised:                                 # yesterday's teaser: keep the promise first
+        plans.insert(0, {"mode": "explainer", "entry": promised, "pillar": promised["category"], "seed": promised["title"],
+                         "category": promised["category"], "fmt": fmt})
     for plan in plans:
         plan.setdefault("fmt", fmt)
+        plan.update({k: v for k, v in eng.items() if k in ("cta_style", "teaser", "promised")})
+        if plan["mode"] == "source":
+            plan["promised"] = None
         tries = 3
         problems: list[str] = []
         label = plan["cand"].title if plan["mode"] == "source" else plan["seed"]
@@ -590,6 +618,8 @@ def build_caption(script: dict) -> str:
             if "AI-generated video." in cap else cap + f"\nSource: {src['publisher']}"
     if script.get("format") == "short" and script.get("first_comment") and "?" not in cap:
         cap = cap.replace("AI-generated video.", f"{script['cta']}\nAI-generated video.") if "AI-generated video." in cap else cap
+    if script.get("teaser") and "AI-generated video." in cap:
+        cap = cap.replace("AI-generated video.", f"Tomorrow: {script['teaser']}\nAI-generated video.")
     if script.get("series") and "AI-generated video." in cap:
         cap = cap.replace("AI-generated video.", f"{series.label(script)}\nAI-generated video.")
     return f"{cap}\n\n{FIXED_TAGS}".strip()

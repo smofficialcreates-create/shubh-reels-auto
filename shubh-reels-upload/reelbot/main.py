@@ -28,7 +28,7 @@ def load_history(path="data/history.json") -> list[dict]:
 def save_script(script: dict, media_id: str, folder: str = "data/scripts") -> None:
     """Keep what the weekly carousel and the growth report need (small, no research logs)."""
     keep = ("topic", "category", "series", "episode", "format", "hook", "hook_focus", "hook_mechanism", "sentences", "scenes",
-            "cta", "takeaway", "caption", "first_comment", "cover_text", "emphasis")
+            "cta", "takeaway", "caption", "first_comment", "cover_text", "emphasis", "cta_style", "keyword", "reward_text", "teaser")
     os.makedirs(folder, exist_ok=True)
     rec = {k: script.get(k) for k in keep}
     rec["media_id"] = media_id
@@ -101,7 +101,8 @@ def main(argv=None) -> int:
         publish.post_comment(cfg, result["id"], script["first_comment"])
     history.append({"date": dt.date.today().isoformat(), "topic": script["topic"], "category": script.get("category"),
                     "hook": script["hook"], "format": script.get("format"), "hook_mechanism": script.get("hook_mechanism"),
-                    "cta_type": script.get("cta_type"), "words": len(" ".join(brand.spoken(script)).split()),
+                    "cta_type": script.get("cta_type"), "cta_style": script.get("cta_style") or "question",
+                    "keyword": script.get("keyword") or None, "promise": script.get("teaser") or None, "words": len(" ".join(brand.spoken(script)).split()),
                     "source_url": (script.get("source") or {}).get("url"),
                     "mode": script.get("mode"), "quality": (script.get("quality") or {}).get("total"),
                     "series": script.get("series"), "episode": script.get("episode"),

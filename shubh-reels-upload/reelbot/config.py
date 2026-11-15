@@ -24,6 +24,7 @@ class Config:
     graph_version: str = field(default_factory=lambda: _env("IG_GRAPH_VERSION", "v23.0"))
     post_at: str = field(default_factory=lambda: _env("POST_AT_IST"))      # e.g. 19:30, India time
     reel_format: str = field(default_factory=lambda: _env("REEL_FORMAT", "short"))   # short | long | alternate
+    keyword_dm: str = field(default_factory=lambda: _env("KEYWORD_DM", "on"))   # on | off: comment-keyword rewards
     repo: str = field(default_factory=lambda: _env("GITHUB_REPOSITORY"))
     gh_token: str = field(default_factory=lambda: _env("GITHUB_TOKEN"))
     publish_mode: str = field(default_factory=lambda: _env("PUBLISH_MODE", "auto"))   # auto | dry

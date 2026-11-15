@@ -6,6 +6,11 @@ OUTRO = "Follow for more smart ways to work."
 OUTRO_SHORT = "I'm Shubh. Follow for more."   # short reels: name goes last, payoff comes first
 
 
+def outro_short(script: dict) -> str:
+    t = script.get("teaser")
+    return f"I'm Shubh. Tomorrow: {t}. Follow so you don't miss it." if t else OUTRO_SHORT
+
+
 def is_short(script: dict) -> bool:
     return script.get("format") == "short"
 
@@ -16,7 +21,7 @@ def spoken(script: dict) -> list[str]:
     if not script.get("with_brand", True):
         return [script["hook"]] + script["sentences"] + [script["cta"]]
     if is_short(script):                       # short reel: payoff first, the name comes last
-        return [script["hook"]] + script["sentences"] + [script["cta"], OUTRO_SHORT] + ([script["loop_line"]] if has_loop(script) else [])
+        return [script["hook"]] + script["sentences"] + [script["cta"], outro_short(script)] + ([script["loop_line"]] if has_loop(script) else [])
     return [script["hook"], INTRO] + script["sentences"] + [script["cta"], OUTRO]
 
 

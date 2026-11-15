@@ -470,3 +470,109 @@ class SeriesLoopCarousel(unittest.TestCase):
         self.assertEqual(out["id"], "id4")
         self.assertEqual(posts[2][1]["children"], "id1,id2")
         self.assertEqual(posts[2][1]["media_type"], "CAROUSEL")
+
+
+class Engagement(unittest.TestCase):
+    def test_styles_rotate_without_back_to_back_repeats(self):
+        from reelbot import engage
+        hist = []
+        for i in range(24):
+            st = engage.pick_style(hist, dt.date(2026, 11, 20) + dt.timedelta(days=i), keyword_ok=True)
+            if hist:
+                self.assertNotEqual(st, hist[-1]["cta_style"])
+            hist.append({"cta_style": st})
+        styles = [h["cta_style"] for h in hist]
+        self.assertGreaterEqual(styles.count("keyword"), 4)
+        self.assertLessEqual(styles.count("keyword"), 8)
+        self.assertGreaterEqual(len(set(styles)), 6)
+        self.assertNotIn("keyword", [engage.pick_style(hist, dt.date(2026, 12, 1), keyword_ok=False) for _ in range(3)])
+
+    def test_each_style_is_checked(self):
+        from reelbot import engage
+        kw = {"keyword": "PROMPT", "reward_text": "Here is what I promised from the reel: ask the assistant for the question behind your question, then answer the best one and ask again for a sharper result."}
+        self.assertEqual(engage.check_cta("choice", "Which would you use first, the weak one or the sharp one?", {}), [])
+        self.assertTrue(engage.check_cta("choice", "Which would you use first?", {}))
+        self.assertTrue(engage.check_cta("rate", "Tell me how useful this was.", {}))
+        self.assertEqual(engage.check_cta("rate", "Rate this from one to five in the comments.", {}), [])
+        self.assertEqual(engage.check_cta("share", "Send this to a friend who asks vague questions.", {}), [])
+        self.assertEqual(engage.check_cta("keyword", "Comment PROMPT and I will send you the exact prompt.", kw), [])
+        self.assertTrue(engage.check_cta("keyword", "Comment below for more.", kw))
+        self.assertTrue(engage.check_cta("keyword", "Comment PROMPT and I will send it.", dict(kw, reward_text="Buy now at https://x.com")))
+
+    def test_keyword_reel_end_to_end(self):
+        raw = dict(SHORT, keyword="prompt", reward_text="Here is what I promised from the reel: ask the assistant what question you should really be asking, "
+                   "pick the sharpest one it lists, then ask that one and request a specific example in your own words.",
+                   cta="Comment PROMPT and I will send you the exact prompt.")
+        plan = dict(short_plan(), cta_style="keyword")
+        script, issues = run_attempt(raw, SHORT_REVIEW, plan)
+        self.assertEqual(issues, [])
+        self.assertEqual((script["keyword"], script["cta_style"]), ("PROMPT", "keyword"))
+        self.assertIn("Comment PROMPT below", script["first_comment"])
+
+    def test_teaser_changes_outro_and_caption(self):
+        from reelbot import brand
+        script, _ = run_attempt(SHORT, SHORT_REVIEW, dict(short_plan(), teaser="Why your assistant forgets"))
+        self.assertEqual(brand.spoken(script)[-1], "I'm Shubh. Tomorrow: Why your assistant forgets. Follow so you don't miss it.")
+        self.assertIn("Tomorrow: Why your assistant forgets", script_gen.build_caption(script))
+
+    def test_teaser_schedule_and_promise_flow(self):
+        from reelbot import engage
+        pick = lambda h, d: {"title": "Why your assistant forgets", "category": "x"}   # noqa: E731
+        hist = [{"cta_style": "question"}] * 5
+        t = engage.pick_teaser(hist, dt.date(2026, 11, 20), pick, keyword_style=False)
+        self.assertEqual(t, "Why your assistant forgets")
+        self.assertIsNone(engage.pick_teaser(hist, dt.date(2026, 11, 20), pick, keyword_style=True))
+        hist.append({"promise": t})
+        self.assertEqual(engage.pending_promise(hist), t)
+        eng = engage.plan_for(Config(), hist, dt.date(2026, 11, 21), "short", pick)
+        self.assertEqual(eng["promised"], t)
+        self.assertIsNone(eng["teaser"])
+        hist.append({"cta_style": "question", "fulfills": t})
+        self.assertIsNone(engage.pending_promise(hist))
+        self.assertIsNone(engage.pick_teaser(hist, dt.date(2026, 11, 22), pick, keyword_style=False))
+
+    def test_long_reels_never_get_keyword_or_teaser(self):
+        from reelbot import engage
+        eng = engage.plan_for(Config(), [{}] * 6, dt.date(2026, 11, 20), "long", lambda h, d: {"title": "A topic"})
+        self.assertEqual((eng["cta_style"], eng["teaser"]), ("question", None))
+
+    def test_responder_replies_once_and_skips_own_comment(self):
+        from reelbot import responder, insights
+        script = {"media_id": "m1", "keyword": "PROMPT", "reward_text": "Here is what I promised.", "first_comment": "Comment PROMPT below and I will send it to you.",
+                  "date": "2026-11-20"}
+        comments = {"data": [{"id": "c1", "text": "prompt please", "username": "fan"}, {"id": "c2", "text": "nice reel", "username": "fan2"},
+                             {"id": "c3", "text": "Comment PROMPT below and I will send it to you.", "username": "me"},
+                             {"id": "c4", "text": "PROMPT!!", "username": "fan3"}]}
+        sent = []
+        with mock.patch("reelbot.responder.insights._get", return_value=comments):
+            replied = {"c4": {"status": "sent"}}
+            n, notes = responder.run(Config(), [script], replied, lambda cfg, cid, text: sent.append(cid), owner="me")
+            n2, _ = responder.run(Config(), [script], replied, lambda cfg, cid, text: sent.append(cid), owner="me")
+        self.assertEqual((n, n2, sent), (1, 0, ["c1"]))
+        self.assertEqual(replied["c1"]["status"], "sent")
+
+    def test_responder_stops_on_permission_error_and_window(self):
+        from reelbot import responder
+        script = {"media_id": "m1", "keyword": "GUIDE", "reward_text": "x" * 30, "date": "2026-11-20"}
+        comments = {"data": [{"id": f"c{i}", "text": "guide", "username": "u"} for i in range(3)]}
+
+        def boom(cfg, cid, text):
+            raise RuntimeError("HTTP 400 code=10 permission")
+        with mock.patch("reelbot.responder.insights._get", return_value=comments):
+            n, notes = responder.run(Config(), [script], {}, boom)
+        self.assertEqual(n, 0)
+        self.assertTrue(any("messages permission" in x for x in notes))
+        import tempfile, os
+        d = tempfile.mkdtemp()
+        json.dump(dict(script, date="2026-11-01"), open(os.path.join(d, "a.json"), "w"))
+        json.dump(script, open(os.path.join(d, "b.json"), "w"))
+        self.assertEqual(len(responder.due_scripts(d, dt.date(2026, 11, 22))), 1)
+
+    def test_growth_tracks_closing_style(self):
+        from reelbot import growth
+        rows = Growth().rows(24)
+        for i, r in enumerate(rows):
+            r["cta_style"] = "keyword" if i % 3 == 0 else "question"
+            r["score"] = 40.0 if r["cta_style"] == "keyword" else 5.0
+        st = growth.analyze(rows)
+        self.assertEqual(st["prefer_cta"][0], "keyword")

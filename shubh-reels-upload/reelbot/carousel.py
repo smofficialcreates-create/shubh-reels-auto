@@ -248,7 +248,7 @@ def _check(r, what):
 
 def push_files(cfg: Config, paths: list[str], branch: str = "media-carousel") -> list[str]:
     """Host the slides on a throw-away branch (same trick as the reel video); returns their public URLs."""
-    stamp = dt.datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%d-%H%M%S")
     tmp = tempfile.mkdtemp(prefix="car-")
     try:
         os.makedirs(os.path.join(tmp, "slides"))
