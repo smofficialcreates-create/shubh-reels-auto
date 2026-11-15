@@ -1,9 +1,9 @@
 """Fixed brand lines spoken in every reel."""
-INTRO = "Want to stay ahead of the curve? I'm Shubh. Let's upgrade the way you think, work and grow."
-OUTRO = "Thanks for watching. Follow for more smart ways to work, and I'll see you in the next one."
+INTRO = "I'm Shubh. Let's upgrade how you think, work and grow."
+OUTRO = "Follow for more smart ways to work."
 
 
-OUTRO_SHORT = "I'm Shubh. Follow me to upgrade the way you think, work and grow."   # short reels: name goes last, payoff comes first
+OUTRO_SHORT = "I'm Shubh. Follow for more."   # short reels: name goes last, payoff comes first
 
 
 def is_short(script: dict) -> bool:
@@ -16,13 +16,17 @@ def spoken(script: dict) -> list[str]:
     if not script.get("with_brand", True):
         return [script["hook"]] + script["sentences"] + [script["cta"]]
     if is_short(script):                       # short reel: payoff first, the name comes last
-        return [script["hook"]] + script["sentences"] + [script["cta"], OUTRO_SHORT]
+        return [script["hook"]] + script["sentences"] + [script["cta"], OUTRO_SHORT] + ([script["loop_line"]] if has_loop(script) else [])
     return [script["hook"], INTRO] + script["sentences"] + [script["cta"], OUTRO]
 
 
 def offset(script: dict) -> int:
     """1 when the intro is spoken right after the hook (long reels only)."""
     return 1 if script.get("with_brand", True) and not is_short(script) else 0
+
+
+def has_loop(script: dict) -> bool:
+    return is_short(script) and bool(script.get("loop_line")) and script.get("with_brand", True)
 
 
 def has_outro(script: dict) -> bool:

@@ -35,7 +35,21 @@ def total_score(scores: dict) -> float:
     return round(sum(WEIGHTS[k] * max(0.0, min(10.0, float(scores.get(k, 0)))) / 10.0 for k in WEIGHTS), 1)
 
 
+def _strategy() -> dict:
+    try:
+        st = json.load(open("data/strategy.json"))
+        return st if st.get("level") in ("early", "reliable") else {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
 def category_bonus(category: str, history: list[dict]) -> float:
+    st = _strategy()
+    return _rotation_bonus(category, history) + (4.0 if category in st.get("prefer_categories", []) else 0.0) \
+        - (6.0 if category in st.get("avoid_categories", []) else 0.0)
+
+
+def _rotation_bonus(category: str, history: list[dict]) -> float:
     """+ for a category not used lately, - for one used in the last two reels."""
     recent = [h.get("category") for h in history[-8:] if h.get("category")]
     if not recent:

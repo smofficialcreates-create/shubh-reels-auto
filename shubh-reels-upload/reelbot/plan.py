@@ -169,11 +169,12 @@ def build_sections(script: dict, nar) -> list[Section]:
                       TRANSITIONS[(seed + k) % len(TRANSITIONS)])
         secs.append(sec)
     # cta (with the spoken outro)
-    ia, ib = last + o, last + o + outro
+    ia = last + o
+    ib = ia + outro + (1 if brand.has_loop(script) else 0)
     t0 = nar.sentence_times[ia][0]
     t1 = nar.sentence_times[ib][1] + 0.25
     secs.append(Section("cta", ia, ib, t0, t1, "forest", "follow",
-                        {"t_follow": nar.sentence_times[ib][0] if outro else t0}, "follow"))
+                        {"t_follow": nar.sentence_times[ia + outro][0] if outro else t0}, "follow"))
     # no two neighbouring scenes share a theme or a transition
     for prev, cur in zip(secs, secs[1:]):
         if cur.kind != "cta" and cur.theme == prev.theme:

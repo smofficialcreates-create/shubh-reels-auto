@@ -12,7 +12,7 @@ import os
 import sys
 import time
 
-from . import brand, cover, editor, publish, script_gen, tts
+from . import brand, cover, editor, publish, script_gen, series, tts
 from .config import Config
 from .sample import SAMPLE
 from .puppet import Shubh as Mascot
@@ -23,6 +23,17 @@ def load_history(path="data/history.json") -> list[dict]:
         return json.load(open(path))
     except (FileNotFoundError, json.JSONDecodeError):
         return []
+
+
+def save_script(script: dict, media_id: str, folder: str = "data/scripts") -> None:
+    """Keep what the weekly carousel and the growth report need (small, no research logs)."""
+    keep = ("topic", "category", "series", "episode", "format", "hook", "hook_focus", "hook_mechanism", "sentences", "scenes",
+            "cta", "takeaway", "caption", "first_comment", "cover_text", "emphasis")
+    os.makedirs(folder, exist_ok=True)
+    rec = {k: script.get(k) for k in keep}
+    rec["media_id"] = media_id
+    rec["date"] = dt.date.today().isoformat()
+    json.dump(rec, open(os.path.join(folder, f"{rec['date']}-{media_id}.json"), "w"), indent=1)
 
 
 def main(argv=None) -> int:
@@ -40,6 +51,8 @@ def main(argv=None) -> int:
     t0 = time.time()
 
     script = dict(SAMPLE) if args.sample else script_gen.generate(cfg, history)
+    if not args.sample:
+        series.assign(script, history)
     json.dump(script, open(os.path.join(args.out_dir, "script.json"), "w"), indent=2)
     print(f"topic: {script['topic']}  (hook score {script.get('hook_score', 'n/a')})")
 
@@ -51,6 +64,7 @@ def main(argv=None) -> int:
     if total > limit and not args.sample:
         print(f"narration is {total:.0f}s, longer than {limit}s; switching to a backup lesson so today still posts")
         script = script_gen.backup_script(history, dt.date.today(), script.get("format") or "long")
+        series.assign(script, history)
         json.dump(script, open(os.path.join(args.out_dir, "script.json"), "w"), indent=2)
         texts = brand.spoken(script)
         nar = tts.synth_fake(texts) if args.fake_tts else tts.synth_voice(texts, cfg.voice, cfg.speed, cfg.model_dir)
@@ -90,7 +104,10 @@ def main(argv=None) -> int:
                     "cta_type": script.get("cta_type"), "words": len(" ".join(brand.spoken(script)).split()),
                     "source_url": (script.get("source") or {}).get("url"),
                     "mode": script.get("mode"), "quality": (script.get("quality") or {}).get("total"),
+                    "series": script.get("series"), "episode": script.get("episode"),
+                    "posted_at": dt.datetime.now(publish.IST).isoformat(timespec="minutes"),
                     "media_id": result["id"]})
+    save_script(script, result["id"])
     json.dump(history[-200:], open("data/history.json", "w"), indent=2)
     return 0
 

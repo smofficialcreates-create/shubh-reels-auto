@@ -333,3 +333,140 @@ class ShortMode(unittest.TestCase):
         from reelbot import publish
         with mock.patch("reelbot.publish.requests.post", side_effect=RuntimeError("down")):
             self.assertIsNone(publish.post_comment(Config(), "123", "hello"))
+
+
+class Requested(unittest.TestCase):
+    def test_every_caption_ends_with_the_six_tags(self):
+        script, _ = run_attempt(SHORT, SHORT_REVIEW, short_plan())
+        cap = script_gen.build_caption(script)
+        self.assertTrue(cap.endswith("#fyp #doubletap #growthmindset #viral #reels #explorepage"))
+        self.assertIn("AI-generated video.", cap)
+
+    def test_preferred_hook_styles_win_ties(self):
+        raw = dict(SHORT, hook_options=["You are asking your assistant the wrong question.", "Nobody mentions this about your prompts."],
+                   hook_mechanisms=["wrong way", "nobody mentions"])
+        self.assertTrue(script_gen.finalize(raw, short_plan())["hook"].startswith("Nobody mentions"))
+
+    def test_brand_lines_are_short(self):
+        from reelbot import brand
+        self.assertLessEqual(len(brand.INTRO.split()), 11)
+        self.assertLessEqual(len(brand.OUTRO_SHORT.split()), 6)
+
+
+class Growth(unittest.TestCase):
+    def rows(self, n=24):
+        import random
+        r = random.Random(1)
+        out = []
+        for i in range(n):
+            cat = ["practical_ai_tutorials", "productivity_methods", "career_skills"][i % 3]
+            fmt = "short" if i % 2 else "long"
+            good = cat == "practical_ai_tutorials"
+            out.append({"media_id": str(i), "topic": f"t{i}", "category": cat, "hook": "h", "hook_mechanism": "nobody mentions" if good else "wrong way",
+                        "format": fmt, "series": "S", "bucket": "evening", "reach": (300 if good else 100) * (2 if fmt == "short" else 1),
+                        "views": 0, "watch_s": 5.0, "shares": 1 if good else 0, "saved": 1, "comments": 0, "likes": 3, "score": 30.0 if good else 5.0})
+        return out
+
+    def test_levels_and_no_change_when_data_is_thin(self):
+        from reelbot import growth
+        st = growth.analyze(self.rows(5))
+        self.assertEqual(st["level"], "collecting")
+        self.assertEqual(st["prefer_categories"], [])
+        self.assertIsNone(st["format_winner"])
+
+    def test_reliable_strategy_finds_winners(self):
+        from reelbot import growth
+        st = growth.analyze(self.rows(24))
+        self.assertEqual(st["level"], "reliable")
+        self.assertEqual(st["prefer_categories"][0], "practical_ai_tutorials")
+        self.assertEqual(st["format_winner"], "short")
+        self.assertIn("nobody mentions", st["prefer_hooks"])
+
+    def test_join_ignores_reels_without_numbers(self):
+        from reelbot import growth
+        hist = [{"media_id": "a", "topic": "x"}, {"media_id": "b", "topic": "y", "posted_at": "2026-11-14T19:30+05:30"}]
+        data = {"media": {"a": {"metrics": {}}, "b": {"metrics": {"reach": 200, "shares": 2, "saved": 3, "likes": 4, "comments": 1,
+                                                                 "ig_reels_avg_watch_time": 6200}}}}
+        rows = growth.join(hist, data)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["bucket"], "evening")
+        self.assertEqual(rows[0]["score"], round((2 * 3 + 3 * 2 + 1 * 2 + 4) / 200 * 1000, 1))
+
+    def test_strategy_steers_the_writer_only_when_enough_data(self):
+        import os, tempfile
+        from reelbot import growth
+        d = tempfile.mkdtemp()
+        p = os.path.join(d, "s.json")
+        json.dump(growth.analyze(self.rows(24)), open(p, "w"))
+        self.assertEqual(script_gen.load_strategy(p)["format_winner"], "short")
+        json.dump(growth.analyze(self.rows(4)), open(p, "w"))
+        self.assertEqual(script_gen.load_strategy(p), {})
+
+    def test_collector_survives_a_rejected_metric(self):
+        from reelbot import insights
+        calls = []
+
+        def fake(cfg, path, params=None):
+            calls.append(params)
+            if params and "," in params.get("metric", ""):
+                raise insights.InsightsError("bad metric")
+            if params and params["metric"] == "views":
+                raise insights.InsightsError("nope")
+            return {"data": [{"name": params["metric"], "values": [{"value": 7}]}]}
+        with mock.patch("reelbot.insights._get", side_effect=fake):
+            m = insights.media_metrics(Config(), "1")
+        self.assertEqual(m["reach"], 7)
+        self.assertNotIn("views", m)
+
+
+class SeriesLoopCarousel(unittest.TestCase):
+    def test_series_numbering(self):
+        from reelbot import series
+        s = series.assign({"category": "practical_ai_tutorials"}, [{"series": "PROMPT FIX"}, {"series": "FOCUS LAB"}, {"series": "PROMPT FIX"}])
+        self.assertEqual((s["series"], s["episode"], series.label(s)), ("PROMPT FIX", 3, "PROMPT FIX #03"))
+
+    def test_loop_line_ends_the_reel_and_is_inside_the_cta_section(self):
+        from reelbot import brand, tts
+        script, _ = run_attempt(dict(SHORT, loop_line="And that is exactly why"), SHORT_REVIEW, short_plan())
+        lines = brand.spoken(script)
+        self.assertEqual(lines[-1], "And that is exactly why")
+        self.assertEqual(lines[-2], brand.OUTRO_SHORT)
+        secs = planner.build_sections(script, tts.synth_fake(lines))
+        self.assertEqual(secs[-1].i1, len(lines) - 1)
+
+    def test_bad_loop_line_is_dropped(self):
+        script, _ = run_attempt(dict(SHORT, loop_line="Is this the end of 3 things?"), SHORT_REVIEW, short_plan())
+        self.assertEqual(script["loop_line"], "")
+
+    def test_carousel_renders_and_picks_the_best_saved_reel(self):
+        import tempfile
+        from reelbot import carousel
+        script, _ = run_attempt(SHORT, SHORT_REVIEW, short_plan())
+        script.update(series="PROMPT FIX", episode=1, media_id="m1", date="2026-11-10")
+        paths = carousel.render_slides(script, tempfile.mkdtemp())
+        self.assertEqual(len(paths), len(script["scenes"]) + 2)
+        self.assertIn("#fyp", carousel.carousel_caption(script))
+        other = dict(script, media_id="m2", date="2026-11-12")
+        self.assertEqual(carousel.pick_script([script, other], [], None)["media_id"], "m2")
+        ins = {"media": {"m1": {"metrics": {"reach": 100, "saved": 9, "shares": 3}}, "m2": {"metrics": {"reach": 100}}}}
+        self.assertEqual(carousel.pick_script([script, other], [], ins)["media_id"], "m1")
+        self.assertEqual(carousel.pick_script([script, other], ["m1", "m2"], None), None)
+
+    def test_carousel_publish_sequence(self):
+        from reelbot import carousel
+        cfg = Config(); cfg.ig_user_id, cfg.ig_token = "U", "T"
+        posts = []
+
+        class R:
+            def __init__(s, d): s.d = d; s.status_code = 200
+            def json(s): return s.d
+
+        def post(url, **k):
+            posts.append((url, k["data"]))
+            return R({"id": f"id{len(posts)}"})
+        with mock.patch("reelbot.carousel.requests.post", side_effect=post), \
+             mock.patch("reelbot.carousel.requests.get", return_value=R({"status_code": "FINISHED"})):
+            out = carousel.publish_carousel(cfg, ["u1", "u2"], "cap")
+        self.assertEqual(out["id"], "id4")
+        self.assertEqual(posts[2][1]["children"], "id1,id2")
+        self.assertEqual(posts[2][1]["media_type"], "CAROUSEL")

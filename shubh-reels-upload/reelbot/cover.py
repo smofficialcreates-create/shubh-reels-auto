@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw
 
-from . import fonts, plan
+from . import fonts, plan, series
 from .animator import Animator
 from . import palette as PAL
 from .editor import make_bg
@@ -36,7 +36,7 @@ def render_cover(script: dict, puppet: Shubh, out_path: str) -> str:
     frame = make_bg("navy").copy()
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    d.text((90, 330), "// SHUBH", font=fonts.get("mono", 30), fill=PAL.GREY + (255,))
+    d.text((90, 330), "// " + (series.label(script) or "SHUBH"), font=fonts.get("mono", 30), fill=PAL.GREY + (255,))
     for w, kind, size, x, y, acc in _wrap(words, ai):
         f = fonts.get(kind, size)
         d.text((x, y), w, font=f, fill=(PAL.GOLD if acc else PAL.IVORY) + (255,), anchor="ls")

@@ -1,0 +1,49 @@
+name: weekly-growth
+
+on:
+  schedule:
+    - cron: "30 3 * * 1"          # Monday 03:30 UTC = 09:00 IST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-growth
+  cancel-in-progress: false
+
+jobs:
+  growth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: shubh-reels-upload
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install requests
+
+      - name: Read the numbers, update the strategy, write the report
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_GRAPH_HOST: ${{ vars.IG_GRAPH_HOST }}
+        run: python -m reelbot.growth
+
+      - name: Save strategy and report
+        run: |
+          git config user.name  "reel-bot"
+          git config user.email "reel-bot@users.noreply.github.com"
+          git add data/insights.json data/strategy.json data/growth_log.json data/reports
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: weekly growth report [skip ci]"
+            git pull --rebase -q || true
+            git push
+          fi

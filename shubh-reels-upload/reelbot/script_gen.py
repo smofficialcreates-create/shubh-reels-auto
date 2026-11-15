@@ -19,7 +19,7 @@ import sys
 
 from vendor.ig_skill import hookscore, humanize
 
-from . import grounding, llm, research, safety, topic
+from . import grounding, llm, research, safety, series, topic
 from .config import Config
 
 PERSONA = """You write the voice of SHUBH, an animated narrator: an intelligent friend who has just found something fascinating and wants you to have it too.
@@ -43,6 +43,9 @@ Write three options, each from a different pattern, fitted to THIS reel's conten
  3. HIDDEN TRUTH: something nobody explains ("Nobody tells you what your assistant is really doing.")
  4. REVERSAL: flip a belief ("Working harder is not why you are behind.")
  5. DIRECT QUESTION or CHALLENGE aimed at the viewer ("Can you explain how your assistant answers you?")
+ 6. NOBODY MENTIONS THIS: an open secret nobody spells out ("Nobody mentions this about AI prompts.", "Nobody tells you this about your to do list.")
+ 7. JUST FIGURED IT OUT: a personal discovery ("I just figured out why my AI answers were vague.")
+At least one of the three options should use pattern 6 or 7, and they are preferred when they fit the content honestly.
 Rules: 5 to 12 words, spoken to "you", concrete, no numbers, no hype words (amazing, insane, mind-blowing, secret hack), and it must be fully answered by the reel: the first body sentence starts paying it off at once. Never promise anything the reel does not deliver."""
 
 HARD_RULES = """HARD RULES
@@ -83,7 +86,7 @@ SCHEMA = """OUTPUT: one JSON object with exactly these keys
  "category": "one of: %s",
  "tag": "2-3 word on-screen label in caps, e.g. AI EXPLAINED",
  "hook_options": ["three hooks from three different patterns in THE HOOK, 5-12 words each, aimed at 'you', true to the content"],
- "hook_mechanisms": ["wrong way | costly mistake | hidden truth | reversal | challenge"],
+ "hook_mechanisms": ["wrong way | costly mistake | hidden truth | reversal | challenge | nobody mentions | just figured out"],
  "hook_focus": "the single most striking word of your best hook",
  "sentences": ["11 to 17 body sentences following the SHAPE"],
  "scenes": [ ...see SCENES... ],
@@ -127,7 +130,8 @@ SHORT_RULES = """HARD RULES (short reel)
 - Never include: prices, plans, "free" claims, version numbers, percentages, income or money claims, guarantees, or anything about politics, religion, health, law, investing, alcohol, tobacco or drugs.
 - Every sentence at most 18 words. Hook + body + closing line: 70 to 100 words in total. Body of 5 to 8 sentences.
 - Do NOT write a greeting, a name, "I'm Shubh" or a follow request: the brand line is added automatically at the end.
-- The closing line is exactly one direct question for the comments, tied to the content."""
+- The closing line is exactly one direct question for the comments, tied to the content.
+- "loop_line": 3 to 8 words, a lead-in clause that is spoken as the very last words and flows grammatically into the HOOK when the video restarts (for example "And that is exactly why" then the hook "Nobody mentions this."). No question mark, no digits."""
 
 SHORT_VISUALS = """SCENES: split the body sentences into 3 to 5 scenes of 1-3 consecutive sentences each, ONE on-screen visual each. Use at least two different types, never the same type twice in a row, and ALWAYS exactly one "chat" scene for the demo (weak prompt then better prompt, or the question and the answer).
 Types: {"type":"chat","prompt":"at most 14 words","result":"at most 22 words"}
@@ -139,7 +143,8 @@ Each scene: {"from": <first sentence>, "to": <last sentence>, "label": "2-3 word
 
 SHORT_SCHEMA = SCHEMA.replace("11 to 17 body sentences following the SHAPE", "5 to 8 body sentences following the SHAPE") \
     .replace('"cta": "the closing line",', '"cta": "ONE question for the comments",\n "first_comment": "a one-line prompt (at most 120 characters, no digits, no links) the account posts as the first comment to start a conversation",') \
-    .replace('"cta_type": "save | send | question"', '"cta_type": "question"')
+    .replace('"cta_type": "save | send | question"', '"cta_type": "question"') \
+    .replace(' "cover_text"', ' "loop_line": "3 to 8 word lead-in that flows into the hook when the video restarts",\n "cover_text"', 1)
 
 PASS_TOTAL = 76          # normal bar
 FALLBACK_TOTAL = 70      # last resort, only after every plan failed; accuracy and claim checks still apply
@@ -165,6 +170,16 @@ def pick_topic(history: list[dict], today: dt.date | None = None) -> tuple[str, 
     return pillar, rng.choice(pool or topics["pillars"][pillar])
 
 
+def load_strategy(path: str | None = None) -> dict:
+    """What the weekly growth manager learned. Empty (no effect) until it has enough data."""
+    path = path or os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "strategy.json")
+    try:
+        st = json.load(open(path, encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return st if st.get("level") in ("early", "reliable") else {}
+
+
 def pick_explainer(history: list[dict], today: dt.date) -> dict:
     """An unused topic from the syllabus, rotating through the categories."""
     path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "syllabus.json")
@@ -173,7 +188,15 @@ def pick_explainer(history: list[dict], today: dt.date) -> dict:
     recent_cats = [h.get("category") for h in history][-3:]
     fresh = [e for e in items if not safety.too_similar(e["title"], past, 0.5)] or items
     varied = [e for e in fresh if e["category"] not in recent_cats] or fresh
-    return random.Random(today.toordinal()).choice(varied)
+    st = load_strategy()
+    rng = random.Random(today.toordinal())
+    if st:                                   # 70 percent follow what works, 30 percent keep exploring
+        pool = [e for e in varied if e["category"] not in st.get("avoid_categories", [])] or varied
+        liked = [e for e in pool if e["category"] in st.get("prefer_categories", [])]
+        if liked and rng.random() < 0.7:
+            pool = liked
+        return rng.choice(pool)
+    return rng.choice(varied)
 
 
 def clean_text(text: str, lex) -> str:
@@ -197,6 +220,8 @@ def finalize(raw: dict, plan: dict | None = None) -> dict:
     scored = []
     for i, h in enumerate(opts):
         _res, overall, verdict, flags = hookscore.run(h)
+        if re.match(r"(nobody (mentions|tells|talks)|i just (figured|found|realized|learned))", h, re.I):
+            overall += 8          # the two hook styles the owner prefers
         scored.append((overall, h, i))
     if not scored:
         raise ValueError("no hooks")
@@ -240,6 +265,7 @@ def finalize(raw: dict, plan: dict | None = None) -> dict:
         "evidence": [e for e in raw.get("evidence", []) if isinstance(e, dict)],
         "opinions": [clean_text(str(o), lex) for o in raw.get("opinions", [])][:6],
         "first_comment": first_comment(raw.get("first_comment"), lex),
+        "loop_line": loop_line(raw.get("loop_line"), lex),
         "cta_type": raw.get("cta_type", ""),
         "cta": cta,
         "cover_text": cover,
@@ -248,9 +274,17 @@ def finalize(raw: dict, plan: dict | None = None) -> dict:
     }
 
 
+FIXED_TAGS = "#fyp #doubletap #growthmindset #viral #reels #explorepage"      # on every reel, as requested
 COMMENT_PROMPTS = ["Which one will you try first? Tell me below.", "What would you ask an AI first? Write it below.",
                    "Did you know this already? Yes or no below.", "What is your biggest struggle with this? Tell me below.",
                    "Want a part two? Comment your topic below.", "Which tip surprised you most? Tell me below."]
+
+
+def loop_line(text, lex) -> str:
+    t = clean_text(str(text or ""), lex).strip(" .!?,")
+    if not (2 <= len(t.split()) <= 9) or re.search(r"\d|https?://|@|#", t):
+        return ""
+    return t
 
 
 def first_comment(text, lex=None, seed: int = 0) -> str:
@@ -369,6 +403,10 @@ def writer_prompt(plan: dict, history: list[dict], problems: list[str], today: d
     avoid = (f"Topics already covered (do not repeat): {json.dumps(past_topics)}\n"
              f"Recent hooks (do not reuse their wording or structure): {json.dumps(past_hooks)}\n")
     fix = f"Fix these problems from the last attempt: {problems[-6:]}\n" if problems else ""
+    st = load_strategy()
+    if st and (st.get("prefer_hooks") or st.get("avoid_hooks")):
+        fix += (f"Our own data ({st.get('sample_size')} reels): hook patterns that did best: {st.get('prefer_hooks') or 'unknown'}; "
+                f"weakest: {st.get('avoid_hooks') or 'none'}. Use a best pattern for at least one hook option.\n")
     if plan["mode"] == "source":
         c = plan["cand"]
         system = "\n\n".join([PERSONA, S, HOOKS, SOURCE_RULES, V, R, SC])
@@ -415,6 +453,8 @@ def attempt(cfg: Config, plan: dict, history: list[dict], problems: list[str], t
     elif words < MIN_WORDS or len(script["sentences"]) < 9:
         issues.append(f"too thin for a deep explainer: {words} words, {len(script['sentences'])} sentences (need {MIN_WORDS}+ words, 9+ sentences)")
     issues += scene_issues(script, short)
+    if script.get("loop_line"):
+        issues += safety.check_text("loop line", script["loop_line"])
     if script["hook_score"] < HOOK_FLOOR:
         issues.append(f"best hook only scores {script['hook_score']} (need {HOOK_FLOOR}+)")
     verified = []
@@ -494,6 +534,9 @@ def pick_format(cfg: Config, today: dt.date) -> str:
     f = (cfg.reel_format or "short").lower()
     if f == "alternate":
         return "short" if today.toordinal() % 2 else "long"
+    if f == "auto":                            # follow the growth manager once it is sure, otherwise alternate
+        w = load_strategy().get("format_winner") if load_strategy().get("level") == "reliable" else None
+        return w or ("short" if today.toordinal() % 2 else "long")
     return "long" if f == "long" else "short"
 
 
@@ -547,5 +590,6 @@ def build_caption(script: dict) -> str:
             if "AI-generated video." in cap else cap + f"\nSource: {src['publisher']}"
     if script.get("format") == "short" and script.get("first_comment") and "?" not in cap:
         cap = cap.replace("AI-generated video.", f"{script['cta']}\nAI-generated video.") if "AI-generated video." in cap else cap
-    tags = " ".join(script["hashtags"][:5])
-    return f"{cap}\n\n{tags}".strip()
+    if script.get("series") and "AI-generated video." in cap:
+        cap = cap.replace("AI-generated video.", f"{series.label(script)}\nAI-generated video.")
+    return f"{cap}\n\n{FIXED_TAGS}".strip()
