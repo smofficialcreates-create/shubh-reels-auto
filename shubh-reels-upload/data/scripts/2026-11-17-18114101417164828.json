@@ -1,0 +1,40 @@
+{
+ "topic": "Ask AI for the question behind your question",
+ "category": "practical_ai_tutorials",
+ "series": "PROMPT FIX",
+ "episode": 1,
+ "format": "short",
+ "hook": "Your AI answers are weak because your question is weak.",
+ "hook_focus": "question",
+ "hook_mechanism": null,
+ "sentences": [
+  "Most people type a short wish and hope for magic.",
+  "Try this instead before you ask anything.",
+  "First, tell the assistant who you are and what you do.",
+  "Second, say what a good answer would help you decide.",
+  "Third, ask it to question you if something is unclear.",
+  "Suddenly the answers sound like they were written for you."
+ ],
+ "scenes": null,
+ "cta": "Save this and try it on your next prompt.",
+ "takeaway": "Fix your weak AI prompts.",
+ "caption": "Weak question, weak answer. Give context, name the decision, invite questions.\nAI-generated video.",
+ "first_comment": "Which tip surprised you most? Tell me below.",
+ "cover_text": "Fix your weak AI prompts",
+ "emphasis": [
+  "question",
+  "people",
+  "anything",
+  "assistant",
+  "second",
+  "something",
+  "suddenly",
+  "prompt"
+ ],
+ "cta_style": "question",
+ "keyword": null,
+ "reward_text": null,
+ "teaser": null,
+ "media_id": "18114101417164828",
+ "date": "2026-11-17"
+}

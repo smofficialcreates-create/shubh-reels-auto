@@ -177,5 +177,25 @@
     "episode": 1,
     "posted_at": "2026-11-15T19:27+05:30",
     "media_id": "18122105683981125"
+  },
+  {
+    "date": "2026-11-17",
+    "topic": "Ask AI for the question behind your question",
+    "category": "practical_ai_tutorials",
+    "hook": "Your AI answers are weak because your question is weak.",
+    "format": "short",
+    "hook_mechanism": null,
+    "cta_type": "save",
+    "cta_style": "question",
+    "keyword": null,
+    "promise": null,
+    "words": 82,
+    "source_url": null,
+    "mode": "backup",
+    "quality": null,
+    "series": "PROMPT FIX",
+    "episode": 1,
+    "posted_at": "2026-11-17T22:16+05:30",
+    "media_id": "18114101417164828"
   }
 ]
