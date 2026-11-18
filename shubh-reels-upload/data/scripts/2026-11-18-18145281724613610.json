@@ -1,0 +1,40 @@
+{
+ "topic": "Turn messy notes into a clear plan with AI",
+ "category": "step_by_step_workflows",
+ "series": "PROMPT FIX",
+ "episode": 2,
+ "format": "short",
+ "hook": "Messy notes are costing you the first hour of your day.",
+ "hook_focus": "costing",
+ "hook_mechanism": null,
+ "sentences": [
+  "Here is a simple way to clean them up in minutes.",
+  "First, paste everything into your assistant without editing.",
+  "Second, ask it to group the notes by topic.",
+  "Third, ask for the three actions that move things forward.",
+  "Then close the notes and start the first action.",
+  "You trade an hour of sorting for a few minutes."
+ ],
+ "scenes": null,
+ "cta": "Send this to someone who lives in messy notes.",
+ "takeaway": "Messy notes into a plan.",
+ "caption": "Paste, group, pick three actions.\nAI-generated video.",
+ "first_comment": "Which one will you try first? Tell me below.",
+ "cover_text": "Messy notes into a plan",
+ "emphasis": [
+  "costing",
+  "minutes",
+  "everything",
+  "second",
+  "actions",
+  "action",
+  "sorting",
+  "someone"
+ ],
+ "cta_style": "question",
+ "keyword": null,
+ "reward_text": null,
+ "teaser": null,
+ "media_id": "18145281724613610",
+ "date": "2026-11-18"
+}

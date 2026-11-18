@@ -197,5 +197,25 @@
     "episode": 1,
     "posted_at": "2026-11-17T22:16+05:30",
     "media_id": "18114101417164828"
+  },
+  {
+    "date": "2026-11-18",
+    "topic": "Turn messy notes into a clear plan with AI",
+    "category": "step_by_step_workflows",
+    "hook": "Messy notes are costing you the first hour of your day.",
+    "format": "short",
+    "hook_mechanism": null,
+    "cta_type": "save",
+    "cta_style": "question",
+    "keyword": null,
+    "promise": null,
+    "words": 82,
+    "source_url": null,
+    "mode": "backup",
+    "quality": null,
+    "series": "PROMPT FIX",
+    "episode": 2,
+    "posted_at": "2026-11-18T19:49+05:30",
+    "media_id": "18145281724613610"
   }
 ]
