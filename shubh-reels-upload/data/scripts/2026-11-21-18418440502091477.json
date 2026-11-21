@@ -1,0 +1,70 @@
+{
+ "topic": "Monitor speed throttling fix",
+ "category": "productivity_methods",
+ "series": "FOCUS LAB",
+ "episode": 1,
+ "format": "short",
+ "hook": "Nobody mentions this about your monitor's Ethernet port.",
+ "hook_focus": "monitor",
+ "hook_mechanism": "nobody mentions",
+ "sentences": [
+  "Your monitor's Ethernet port can be dropping packets without you knowing.",
+  "When the adapter can't keep up, it simply discards frames, cutting your speed.",
+  "Instead of asking \"why is my speed slow?\", try \"enable Ethernet flow control on my router\".",
+  "That tells the sender to pause and buffer, preventing drops.",
+  "Turning flow control on in the UniFi console lifted the download to about two gigabits.",
+  "Now you can keep the full line speed without extra hardware."
+ ],
+ "scenes": [
+  {
+   "from": 1,
+   "to": 2,
+   "label": "packet loss",
+   "visual": {
+    "type": "definition",
+    "term": "packet drop",
+    "meaning": "adapter discards frames it can't process"
+   }
+  },
+  {
+   "from": 3,
+   "to": 4,
+   "label": "prompt swap",
+   "visual": {
+    "type": "chat",
+    "prompt": "why is my speed slow?",
+    "result": "enable Ethernet flow control on my router"
+   }
+  },
+  {
+   "from": 6,
+   "to": 6,
+   "label": "final result",
+   "visual": {
+    "type": "keyword",
+    "word": null
+   }
+  }
+ ],
+ "cta": "Comment STEPS to get the exact router steps I used.",
+ "takeaway": "Enable Ethernet flow control on your router to stop monitor\u2011related speed loss.",
+ "caption": "Nobody mentions this about your monitor's Ethernet port.\nEnable flow control and keep your full speed.\nMonitor ethernet flow control speed fix\nAI-generated video.",
+ "first_comment": "Comment STEPS below and I will send it to you.",
+ "cover_text": "Monitor throttling solved",
+ "emphasis": [
+  "monitor",
+  "monitor",
+  "adapter",
+  "enable",
+  "pause",
+  "turning",
+  "keep",
+  null
+ ],
+ "cta_style": "keyword",
+ "keyword": "STEPS",
+ "reward_text": "Here is what I promised from the reel: Open your UniFi console, go to Settings \u2192 Advanced \u2192 Flow Control, enable it for the port connected to your monitor, apply changes, and reboot the router. This restores full line speed through the monitor\u2019s Ethernet port.",
+ "teaser": "",
+ "media_id": "18418440502091477",
+ "date": "2026-11-21"
+}

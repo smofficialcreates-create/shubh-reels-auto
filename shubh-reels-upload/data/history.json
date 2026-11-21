@@ -217,5 +217,25 @@
     "episode": 2,
     "posted_at": "2026-11-18T19:49+05:30",
     "media_id": "18145281724613610"
+  },
+  {
+    "date": "2026-11-21",
+    "topic": "Monitor speed throttling fix",
+    "category": "productivity_methods",
+    "hook": "Nobody mentions this about your monitor's Ethernet port.",
+    "format": "short",
+    "hook_mechanism": "nobody mentions",
+    "cta_type": "keyword",
+    "cta_style": "keyword",
+    "keyword": "STEPS",
+    "promise": null,
+    "words": 102,
+    "source_url": "https://blog.tymscar.com/posts/studiodisplayethernet/",
+    "mode": "source",
+    "quality": 87,
+    "series": "FOCUS LAB",
+    "episode": 1,
+    "posted_at": "2026-11-21T19:27+05:30",
+    "media_id": "18418440502091477"
   }
 ]
