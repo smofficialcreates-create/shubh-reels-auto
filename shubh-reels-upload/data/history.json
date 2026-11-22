@@ -237,5 +237,25 @@
     "episode": 1,
     "posted_at": "2026-11-21T19:27+05:30",
     "media_id": "18418440502091477"
+  },
+  {
+    "date": "2026-11-22",
+    "topic": "Meeting that works",
+    "category": "business_insights",
+    "hook": "Nobody mentions this about meeting purpose.",
+    "format": "short",
+    "hook_mechanism": "nobody mentions",
+    "cta_type": "blank",
+    "cta_style": "blank",
+    "keyword": null,
+    "promise": "Negotiation basics: interests and alternatives",
+    "words": 110,
+    "source_url": null,
+    "mode": "explainer",
+    "quality": 70,
+    "series": "CAREER MOVE",
+    "episode": 2,
+    "posted_at": "2026-11-22T19:27+05:30",
+    "media_id": "17919671652468112"
   }
 ]

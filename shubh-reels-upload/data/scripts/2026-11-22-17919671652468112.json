@@ -1,0 +1,103 @@
+{
+ "topic": "Meeting that works",
+ "category": "business_insights",
+ "series": "CAREER MOVE",
+ "episode": 2,
+ "format": "short",
+ "hook": "Nobody mentions this about meeting purpose.",
+ "hook_focus": "purpose",
+ "hook_mechanism": "nobody mentions",
+ "sentences": [
+  "A meeting should start like a flight: you state the destination.",
+  "You often walk in without a clear purpose, so you end up drifting.",
+  "Instead of \"Let's talk,\" ask \"What decision must we make?\"",
+  "Then assign one person to own each action and note it.",
+  "Sending the notes that day turns the meeting into a runway, not a hangar.",
+  "Fill in the blank: the single word that makes your meetings fly is blank."
+ ],
+ "scenes": [
+  {
+   "from": 1,
+   "to": 1,
+   "label": "flight analogy",
+   "visual": {
+    "type": "definition",
+    "term": "flight",
+    "meaning": "meeting starts with a clear destination"
+   }
+  },
+  {
+   "from": 2,
+   "to": 2,
+   "label": "drift problem",
+   "visual": {
+    "type": "checklist",
+    "labels": [
+     "no purpose",
+     "no decision",
+     "no owner"
+    ],
+    "sync": [
+     2
+    ]
+   }
+  },
+  {
+   "from": 3,
+   "to": 3,
+   "label": "prompt swap",
+   "visual": {
+    "type": "chat",
+    "prompt": "Let's talk",
+    "result": "What decision must we make?"
+   }
+  },
+  {
+   "from": 5,
+   "to": 5,
+   "label": "quick notes",
+   "visual": {
+    "type": "flow",
+    "nodes": [
+     "meet",
+     "decide",
+     "assign",
+     "send notes"
+    ],
+    "sync": [
+     5
+    ]
+   }
+  },
+  {
+   "from": 6,
+   "to": 6,
+   "label": "fill blank",
+   "visual": {
+    "type": "keyword",
+    "word": "blank"
+   }
+  }
+ ],
+ "cta": "Finish this in the comments: the word that makes your meetings fly is blank.",
+ "takeaway": "You can run meetings like flights by stating purpose, decision, owner, and sending notes the same day.",
+ "caption": "Nobody mentions this about meeting purpose.\nYou can run meetings like flights by stating purpose, decision, owner, and sending notes the same day.\nMeeting purpose decision owner productivity\nAI-generated video.",
+ "first_comment": "What single word would turn your meetings into purposeful flights?",
+ "cover_text": "Turn meetings into purposeful flights",
+ "emphasis": [
+  "purpose",
+  "flight",
+  null,
+  "decision",
+  null,
+  "notes",
+  "blank",
+  null
+ ],
+ "cta_style": "blank",
+ "keyword": "",
+ "reward_text": "",
+ "teaser": "Negotiation basics: interests and alternatives",
+ "media_id": "17919671652468112",
+ "date": "2026-11-22"
+}
