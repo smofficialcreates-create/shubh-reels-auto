@@ -1,0 +1,84 @@
+{
+ "updated": "2026-11-23",
+ "sample_size": 2,
+ "level": "collecting",
+ "prefer_categories": [],
+ "avoid_categories": [],
+ "prefer_hooks": [],
+ "avoid_hooks": [],
+ "prefer_cta": [],
+ "avoid_cta": [],
+ "format_winner": null,
+ "best_time": null,
+ "groups": {
+  "category": {
+   "productivity_methods": {
+    "n": 1,
+    "reach": 0,
+    "score": 0.0,
+    "watch_s": 4.8
+   },
+   "business_insights": {
+    "n": 1,
+    "reach": 19,
+    "score": 105.3,
+    "watch_s": 2.9
+   }
+  },
+  "hook": {
+   "nobody mentions": {
+    "n": 2,
+    "reach": 9.5,
+    "score": 52.6,
+    "watch_s": 3.8
+   }
+  },
+  "format": {
+   "short": {
+    "n": 2,
+    "reach": 9.5,
+    "score": 52.6,
+    "watch_s": 3.8
+   }
+  },
+  "series": {
+   "FOCUS LAB": {
+    "n": 1,
+    "reach": 0,
+    "score": 0.0,
+    "watch_s": 4.8
+   },
+   "CAREER MOVE": {
+    "n": 1,
+    "reach": 19,
+    "score": 105.3,
+    "watch_s": 2.9
+   }
+  },
+  "time": {
+   "evening": {
+    "n": 2,
+    "reach": 9.5,
+    "score": 52.6,
+    "watch_s": 3.8
+   }
+  },
+  "cta": {
+   "keyword": {
+    "n": 1,
+    "reach": 0,
+    "score": 0.0,
+    "watch_s": 4.8
+   },
+   "blank": {
+    "n": 1,
+    "reach": 19,
+    "score": 105.3,
+    "watch_s": 2.9
+   }
+  }
+ },
+ "notes": [
+  "Only 2 reels with data so far. Collecting; no changes are made to the writer yet (it needs 12)."
+ ]
+}
