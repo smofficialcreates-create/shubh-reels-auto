@@ -257,5 +257,25 @@
     "episode": 2,
     "posted_at": "2026-11-22T19:27+05:30",
     "media_id": "17919671652468112"
+  },
+  {
+    "date": "2026-11-23",
+    "topic": "Local AI chatbot in minutes",
+    "category": "practical_ai_tutorials",
+    "hook": "Nobody mentions this about private AI chatbots.",
+    "format": "short",
+    "hook_mechanism": "nobody mentions",
+    "cta_type": "rate",
+    "cta_style": "rate",
+    "keyword": null,
+    "promise": null,
+    "words": 113,
+    "source_url": "https://www.gpupartner.com/blog/beginners-guide-local-ai-inkling-qwen-unsloth",
+    "mode": "source",
+    "quality": 81,
+    "series": "PROMPT FIX",
+    "episode": 3,
+    "posted_at": "2026-11-23T19:59+05:30",
+    "media_id": "18143453767712014"
   }
 ]

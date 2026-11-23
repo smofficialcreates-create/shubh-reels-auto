@@ -1,0 +1,112 @@
+{
+ "topic": "Local AI chatbot in minutes",
+ "category": "practical_ai_tutorials",
+ "series": "PROMPT FIX",
+ "episode": 3,
+ "format": "short",
+ "hook": "Nobody mentions this about private AI chatbots.",
+ "hook_focus": "private",
+ "hook_mechanism": "nobody mentions",
+ "sentences": [
+  "Instead of chasing cloud subscriptions, you can run a ChatGPT clone on your PC.",
+  "You think you need code and terminals, but the whole process is GUI\u2011only.",
+  "Instead of asking \"How do I install a local model?\", ask \"Install Unsloth Desktop, download a quantized Qwen model, enable LAN.\"",
+  "Unsloth serves the model through a simple chat window, no Python needed.",
+  "All you need is a Windows PC with a GPU that fits the model size.",
+  "Rate how useful this was from one to five in the comments."
+ ],
+ "scenes": [
+  {
+   "from": 1,
+   "to": 1,
+   "label": "private replace",
+   "visual": {
+    "type": "definition",
+    "term": "private clone",
+    "meaning": "run ChatGPT locally without cloud"
+   }
+  },
+  {
+   "from": 2,
+   "to": 2,
+   "label": "no code needed",
+   "visual": {
+    "type": "checklist",
+    "labels": [
+     "no terminal commands",
+     "no Python",
+     "no subscriptions"
+    ],
+    "sync": [
+     2
+    ]
+   }
+  },
+  {
+   "from": 3,
+   "to": 3,
+   "label": "prompt demo",
+   "visual": {
+    "type": "chat",
+    "prompt": "Install Unsloth Desktop, download a quantized Qwen model, enable LAN",
+    "result": "Model runs locally, LAN access for whole house"
+   }
+  },
+  {
+   "from": 4,
+   "to": 4,
+   "label": "serve model",
+   "visual": {
+    "type": "definition",
+    "term": "serve",
+    "meaning": "provide chat via simple UI"
+   }
+  },
+  {
+   "from": 5,
+   "to": 5,
+   "label": "hardware need",
+   "visual": {
+    "type": "flow",
+    "nodes": [
+     "GPU with VRAM",
+     "model size match",
+     "run locally"
+    ],
+    "sync": [
+     5
+    ]
+   }
+  },
+  {
+   "from": 6,
+   "to": 6,
+   "label": "rate it",
+   "visual": {
+    "type": "keyword",
+    "word": "rate"
+   }
+  }
+ ],
+ "cta": "How useful was this on a scale from one to five?",
+ "takeaway": "You can set up a private AI chatbot on Windows without writing code or paying cloud fees.",
+ "caption": "Nobody mentions this about private AI chatbots. You can set up a private AI chatbot on Windows without writing code or paying cloud fees. Private AI local chatbot setup AI tutorial AI-generated video.",
+ "first_comment": "Tell me your rating and what you'd try next.",
+ "cover_text": "Run ChatGPT at home instantly",
+ "emphasis": [
+  "private",
+  null,
+  "GUI",
+  "install",
+  null,
+  "GPU",
+  "rate",
+  null
+ ],
+ "cta_style": "rate",
+ "keyword": "",
+ "reward_text": "",
+ "teaser": "",
+ "media_id": "18143453767712014",
+ "date": "2026-11-23"
+}
