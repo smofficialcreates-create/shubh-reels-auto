@@ -1,0 +1,77 @@
+{
+ "topic": "Muse in Instagram DMs",
+ "category": "practical_ai_tutorials",
+ "series": "PROMPT FIX",
+ "episode": 4,
+ "format": "short",
+ "hook": "Nobody mentions this about Muse in Instagram DMs",
+ "hook_focus": "Muse",
+ "hook_mechanism": "nobody mentions",
+ "sentences": [
+  "Instagram users can now chat with Meta's AI agent Muse in a DM thread.",
+  "You can ask Muse to add a coffee shop to an itinerary or find a shoe deal.",
+  "Muse also organizes saved posts into Collections and can turn a recipe video into a grocery list.",
+  "All of this happens without leaving Instagram, so you stay in the same app.",
+  "Because Muse lives in the DM, you can prompt it directly on the post you're looking at."
+ ],
+ "scenes": [
+  {
+   "from": 1,
+   "to": 1,
+   "label": "what is muse",
+   "visual": {
+    "type": "definition",
+    "term": "Muse",
+    "meaning": "Meta's AI chat assistant inside Instagram DMs"
+   }
+  },
+  {
+   "from": 2,
+   "to": 2,
+   "label": "prompt demo",
+   "visual": {
+    "type": "chat",
+    "prompt": "Add coffee shop",
+    "result": "Add a coffee shop in Mexico City to my itinerary"
+   }
+  },
+  {
+   "from": 3,
+   "to": 5,
+   "label": "how it works",
+   "visual": {
+    "type": "flow",
+    "nodes": [
+     "Ask Muse in DM",
+     "Muse reads post context",
+     "Muse returns action or list"
+    ],
+    "sync": [
+     3,
+     4,
+     5
+    ]
+   }
+  }
+ ],
+ "cta": "Send this to a friend who still scrolls without a plan.",
+ "takeaway": "You can now use Muse in Instagram DMs to plan, organize and act on saved content without leaving the app.",
+ "caption": "Nobody mentions this about Muse in Instagram DMs. You can now use Muse in Instagram DMs to plan, organize and act on saved content without leaving the app. Instagram ai assistant muse practical tutorial. AI-generated video.",
+ "first_comment": "What's the first thing you'd ask Muse to do for you?",
+ "cover_text": "Muse lives in your Instagram DMs",
+ "emphasis": [
+  "Muse",
+  "Instagram",
+  "Ask",
+  "Muse",
+  "All",
+  "Because",
+  "Send"
+ ],
+ "cta_style": "share",
+ "keyword": "",
+ "reward_text": "",
+ "teaser": "",
+ "media_id": "17956113519339209",
+ "date": "2026-11-24"
+}

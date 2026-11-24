@@ -277,5 +277,25 @@
     "episode": 3,
     "posted_at": "2026-11-23T19:59+05:30",
     "media_id": "18143453767712014"
+  },
+  {
+    "date": "2026-11-24",
+    "topic": "Muse in Instagram DMs",
+    "category": "practical_ai_tutorials",
+    "hook": "Nobody mentions this about Muse in Instagram DMs",
+    "format": "short",
+    "hook_mechanism": "nobody mentions",
+    "cta_type": "share",
+    "cta_style": "share",
+    "keyword": null,
+    "promise": null,
+    "words": 107,
+    "source_url": "https://techcrunch.com/2026/11/24/meta-brings-its-muse-ai-assistant-directly-into-instagram-dms/",
+    "mode": "source",
+    "quality": 82,
+    "series": "PROMPT FIX",
+    "episode": 4,
+    "posted_at": "2026-11-25T00:40+05:30",
+    "media_id": "17956113519339209"
   }
 ]
