@@ -297,5 +297,25 @@
     "episode": 4,
     "posted_at": "2026-11-25T00:40+05:30",
     "media_id": "17956113519339209"
+  },
+  {
+    "date": "2026-11-24",
+    "topic": "The two list method for deciding what to do first",
+    "category": "productivity_methods",
+    "hook": "Your to do list is not a plan, it is a pile.",
+    "format": "short",
+    "hook_mechanism": null,
+    "cta_type": "save",
+    "cta_style": "question",
+    "keyword": null,
+    "promise": null,
+    "words": 78,
+    "source_url": null,
+    "mode": "backup",
+    "quality": null,
+    "series": "FOCUS LAB",
+    "episode": 2,
+    "posted_at": "2026-11-25T04:31+05:30",
+    "media_id": "18166274233449943"
   }
 ]
