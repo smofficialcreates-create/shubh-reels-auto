@@ -1,0 +1,126 @@
+{
+ "topic": "Automation: triggers, filters and actions",
+ "category": "underrated_tools",
+ "series": "AI DECODED",
+ "episode": 1,
+ "format": "short",
+ "hook": "Nobody mentions this about automation triggers.",
+ "hook_focus": "triggers",
+ "hook_mechanism": "nobody mentions",
+ "sentences": [
+  "A trigger is like a doorbell that starts everything.",
+  "You set it, but nothing happens until the knock arrives.",
+  "A filter then decides if that knock matches your rule.",
+  "The action runs the work once the filter approves.",
+  "Demo: weak prompt \"When I get an email, do something.\" Better: \"When I receive an email from boss, create a task.\"",
+  "Adding an alert step tells you when the flow fails silently."
+ ],
+ "scenes": [
+  {
+   "from": 1,
+   "to": 1,
+   "label": "definition",
+   "visual": {
+    "type": "definition",
+    "term": "trigger",
+    "meaning": "starts the automation like a doorbell"
+   }
+  },
+  {
+   "from": 2,
+   "to": 2,
+   "label": "flow",
+   "visual": {
+    "type": "flow",
+    "nodes": [
+     "set trigger",
+     "wait for knock",
+     "nothing"
+    ],
+    "sync": [
+     2
+    ]
+   }
+  },
+  {
+   "from": 3,
+   "to": 3,
+   "label": "compare",
+   "visual": {
+    "type": "compare",
+    "left": {
+     "title": "weak way",
+     "rows": [
+      "no filter",
+      "any knock passes"
+     ]
+    },
+    "right": {
+     "title": "better way",
+     "rows": [
+      "filter checks rule",
+      "only matching knocks pass"
+     ]
+    }
+   }
+  },
+  {
+   "from": 4,
+   "to": 4,
+   "label": "definition",
+   "visual": {
+    "type": "definition",
+    "term": "action",
+    "meaning": "task performed after filter passes"
+   }
+  },
+  {
+   "from": 5,
+   "to": 5,
+   "label": "chat demo",
+   "visual": {
+    "type": "chat",
+    "prompt": "When I get an email, do something.",
+    "result": "When I receive an email from boss, create a task."
+   }
+  },
+  {
+   "from": 6,
+   "to": 6,
+   "label": "checklist",
+   "visual": {
+    "type": "checklist",
+    "labels": [
+     "set trigger",
+     "add filter",
+     "define action",
+     "add alert"
+    ],
+    "sync": [
+     6
+    ]
+   }
+  }
+ ],
+ "cta": "Comment STEPS to get the checklist.",
+ "takeaway": "You can build a reliable automation with a trigger, filter, action and an alert.",
+ "caption": "Nobody mentions this about automation triggers.\nYou can build a reliable automation with a trigger, filter, action and an alert.\nAutomation triggers filters actions checklist\nAI-generated video.",
+ "first_comment": "Comment STEPS below and I will send it to you.",
+ "cover_text": "Automation made simple",
+ "emphasis": [
+  "triggers",
+  "trigger",
+  "knock",
+  "filter",
+  "action",
+  null,
+  null,
+  null
+ ],
+ "cta_style": "keyword",
+ "keyword": "STEPS",
+ "reward_text": "Here is what I promised from the reel: A ready\u2011to\u2011copy checklist \u2013 1) Define the trigger event, 2) Add a filter that matches your exact condition, 3) Set the action you want performed, 4) Include an alert step that notifies you on failure. Paste this into any automation tool and start testing.",
+ "teaser": "",
+ "media_id": "18123456883959411",
+ "date": "2026-11-25"
+}

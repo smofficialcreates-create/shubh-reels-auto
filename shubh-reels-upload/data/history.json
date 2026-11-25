@@ -317,5 +317,25 @@
     "episode": 2,
     "posted_at": "2026-11-25T04:31+05:30",
     "media_id": "18166274233449943"
+  },
+  {
+    "date": "2026-11-25",
+    "topic": "Automation: triggers, filters and actions",
+    "category": "underrated_tools",
+    "hook": "Nobody mentions this about automation triggers.",
+    "format": "short",
+    "hook_mechanism": "nobody mentions",
+    "cta_type": "keyword",
+    "cta_style": "keyword",
+    "keyword": "STEPS",
+    "promise": null,
+    "words": 90,
+    "source_url": null,
+    "mode": "explainer",
+    "quality": 73,
+    "series": "AI DECODED",
+    "episode": 1,
+    "posted_at": "2026-11-26T03:46+05:30",
+    "media_id": "18123456883959411"
   }
 ]
