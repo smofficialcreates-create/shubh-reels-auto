@@ -337,5 +337,25 @@
     "episode": 1,
     "posted_at": "2026-11-26T03:46+05:30",
     "media_id": "18123456883959411"
+  },
+  {
+    "date": "2026-11-26",
+    "topic": "Use AI to rehearse a hard conversation",
+    "category": "career_skills",
+    "hook": "Dreading a talk with your manager? Rehearse it first.",
+    "format": "short",
+    "hook_mechanism": null,
+    "cta_type": "save",
+    "cta_style": "question",
+    "keyword": null,
+    "promise": null,
+    "words": 74,
+    "source_url": null,
+    "mode": "backup",
+    "quality": null,
+    "series": "CAREER MOVE",
+    "episode": 3,
+    "posted_at": "2026-11-27T03:40+05:30",
+    "media_id": "18157984762546888"
   }
 ]
