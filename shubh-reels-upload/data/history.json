@@ -357,5 +357,25 @@
     "episode": 3,
     "posted_at": "2026-11-27T03:40+05:30",
     "media_id": "18157984762546888"
+  },
+  {
+    "date": "2026-11-27",
+    "topic": "Write a resume line with the action, the change and the proof",
+    "category": "career_skills",
+    "hook": "Most resume lines describe a job instead of a result.",
+    "format": "short",
+    "hook_mechanism": null,
+    "cta_type": "save",
+    "cta_style": "question",
+    "keyword": null,
+    "promise": null,
+    "words": 72,
+    "source_url": null,
+    "mode": "backup",
+    "quality": null,
+    "series": "CAREER MOVE",
+    "episode": 4,
+    "posted_at": "2026-11-28T03:26+05:30",
+    "media_id": "18113272261897832"
   }
 ]
