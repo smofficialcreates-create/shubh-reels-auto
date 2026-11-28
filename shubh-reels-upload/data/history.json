@@ -377,5 +377,26 @@
     "episode": 4,
     "posted_at": "2026-11-28T03:26+05:30",
     "media_id": "18113272261897832"
+  },
+  {
+    "date": "2026-11-28",
+    "topic": "The five minute start rule",
+    "category": "psychology_learning",
+    "hook": "You do not lack discipline, you lack a tiny start.",
+    "format": "short",
+    "hook_mechanism": null,
+    "lang": "en",
+    "cta_type": "save",
+    "cta_style": "question",
+    "keyword": null,
+    "promise": null,
+    "words": 81,
+    "source_url": null,
+    "mode": "backup",
+    "quality": null,
+    "series": "BRAIN LAB",
+    "episode": 1,
+    "posted_at": "2026-11-29T02:18+05:30",
+    "media_id": "18129741587313234"
   }
 ]
