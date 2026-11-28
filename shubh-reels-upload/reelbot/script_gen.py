@@ -46,8 +46,9 @@ Write three options, each from a different pattern, fitted to THIS reel's conten
  5. DIRECT QUESTION or CHALLENGE aimed at the viewer ("Can you explain how your assistant answers you?")
  6. NOBODY MENTIONS THIS: an open secret nobody spells out ("Nobody mentions this about AI prompts.", "Nobody tells you this about your to do list.")
  7. JUST FIGURED IT OUT: a personal discovery ("I just figured out why my AI answers were vague.")
+ 9. RESULT FIRST: invite the viewer to watch the outcome ("Watch a weak prompt turn into a sharp one.", "Watch AI fix this resume line.") - only when the first scene really shows that outcome; never promise jobs, money or grades.
  8. MILD OPINION: a bold but defensible take about a method or habit, never about people, groups, companies or politics ("Most AI advice is backwards.", "Stop asking AI for the answer.")
-At least one of the three options should use pattern 6, 7 or 8, and they are preferred when they fit the content honestly. A mild opinion must be something the reel then explains and supports.
+At least one of the three options should use pattern 6, 7, 8 or 9, and they are preferred when they fit the content honestly. A mild opinion must be something the reel then explains and supports.
 Rules: 5 to 12 words, spoken to "you", concrete, no numbers, no hype words (amazing, insane, mind-blowing, secret hack), and it must be fully answered by the reel: the first body sentence starts paying it off at once. Never promise anything the reel does not deliver."""
 
 HARD_RULES = """HARD RULES
@@ -88,7 +89,7 @@ SCHEMA = """OUTPUT: one JSON object with exactly these keys
  "category": "one of: %s",
  "tag": "2-3 word on-screen label in caps, e.g. AI EXPLAINED",
  "hook_options": ["three hooks from three different patterns in THE HOOK, 5-12 words each, aimed at 'you', true to the content"],
- "hook_mechanisms": ["wrong way | costly mistake | hidden truth | reversal | challenge | nobody mentions | just figured out | opinion"],
+ "hook_mechanisms": ["wrong way | costly mistake | hidden truth | reversal | challenge | nobody mentions | just figured out | opinion | result first"],
  "hook_focus": "the single most striking word of your best hook",
  "sentences": ["11 to 17 body sentences following the SHAPE"],
  "scenes": [ ...see SCENES... ],
@@ -114,17 +115,18 @@ You receive the script, a mode, and when present the SOURCE article. Score hones
  visuals /10 (the scene visuals show the idea accurately and fit the sentences they sit on)
  originality /5
 Also list "unsupported_claims": any statement that is wrong, overstated, contested, or (source mode) not backed by the SOURCE. Standard textbook definitions are not unsupported.
+LANGUAGE "Hinglish": judge it as natural, correct, friendly Hinglish, and check that "speech" (Devanagari) says the same thing as the Hinglish lines, line by line, with nothing mistranslated, unsafe or changed in meaning.
 FORMAT "short" (about 35 seconds): judge depth as one clear mechanism, one concrete demo and one limit; do NOT reject it for having fewer than three stages. Reject a short reel whose closing line is only a request to save or follow, or whose demo is not useful tomorrow.
 Reject for: medical, legal or financial advice; income promises; politics, religion, alcohol, tobacco, drugs; disparaging a person or company; pricing or free claims; fewer than three stages; padding; a visual that contradicts the sentence.
 Reply with JSON only: {"hook": 0, "accuracy": 0, "depth": 0, "clarity": 0, "retention": 0, "visuals": 0, "originality": 0, "unsupported_claims": [], "problems": []}"""
 
-SHORT_STRUCTURE = """SHAPE of the reel (about 35 seconds, 70 to 100 spoken words in hook + body + closing line). ONE idea, one mechanism, no recap.
-1. HOOK (first words spoken, see THE HOOK).
-2. PAYOFF AT ONCE: the first body sentence starts answering the hook. No greeting, no setup.
-3. THE PROBLEM, in one or two sentences, in the viewer's own words.
-4. THE DEMO: a weak prompt or approach, then the better one, shown on screen as a "chat" visual and read aloud ("Instead of X, ask Y").
-5. THE REASON it works, one sentence.
-6. CLOSING LINE: follows the CLOSING STYLE given in the task (a question, a pick-a-side, a fill-in, a rating, a share request or a keyword reward). Never "save this" and never "follow".
+SHORT_STRUCTURE = """SHAPE of the reel (about 35 seconds, 70 to 100 spoken words in hook + body + closing line). RESULTS FIRST: show the outcome before explaining it. ONE idea, one mechanism, no recap.
+1. HOOK (first words spoken, see THE HOOK). When it fits, use the RESULT FIRST pattern.
+2. THE RESULT, body sentences 1 and 2, straight after the hook and covered by the on-screen chat demo: say what the viewer is looking at, for example "Here is a weak resume line. Here is the same line after one better prompt." No greeting, no setup, no background before it.
+3. THE PROMPT, one or two sentences: the better prompt in plain words, so the viewer can copy the idea.
+4. WHY IT WORKS, one or two sentences: the single reason, in plain words.
+5. THE CATCH, one short sentence: when it does not work or what to check.
+6. CLOSING LINE: follows the CLOSING STYLE given in the task. Never "save this" and never "follow".
 The viewer must be able to use it tomorrow with a free general AI assistant or on paper. Audience: students and early-career people who do NOT code. Skip developer-only tools and topics (code, repositories, servers, APIs)."""
 
 SHORT_RULES = """HARD RULES (short reel)
@@ -135,7 +137,7 @@ SHORT_RULES = """HARD RULES (short reel)
 - The closing line follows the CLOSING STYLE given in the task, tied to the content, one sentence, spoken, no digits (numbers as words).
 - "loop_line": 3 to 8 words, a lead-in clause that is spoken as the very last words and flows grammatically into the HOOK when the video restarts (for example "And that is exactly why" then the hook "Nobody mentions this."). No question mark, no digits."""
 
-SHORT_VISUALS = """SCENES: split the body sentences into 3 to 5 scenes of 1-3 consecutive sentences each, ONE on-screen visual each. Use at least two different types, never the same type twice in a row, and ALWAYS exactly one "chat" scene for the demo (weak prompt then better prompt, or the question and the answer).
+SHORT_VISUALS = """SCENES: split the body sentences into 3 to 5 scenes of 1-3 consecutive sentences each, ONE on-screen visual each. Use at least two different types, never the same type twice in a row, and ALWAYS exactly one "chat" scene for the demo (the better prompt and the answer it gets), and it MUST be the FIRST scene, starting at sentence 1.
 Types: {"type":"chat","prompt":"at most 14 words","result":"at most 22 words"}
  {"type":"compare","left":{"title":"the weak way","rows":["2-3 short rows"]},"right":{"title":"the better way","rows":["2-3 short rows"]}}
  {"type":"definition","term":"1-3 words","meaning":"at most 14 words"}
@@ -148,6 +150,12 @@ SHORT_SCHEMA = SCHEMA.replace("11 to 17 body sentences following the SHAPE", "5 
     .replace('"cta_type": "save | send | question"', '"cta_type": "the CLOSING STYLE name"') \
     .replace(' "cover_text"', ' "keyword": "ONLY for the keyword style: one of PROMPT, STEPS, GUIDE, CHECKLIST, TEMPLATE, else empty",\n "reward_text": "ONLY for the keyword style: the message sent to commenters, else empty",\n "cover_text"', 1) \
     .replace(' "cover_text"', ' "loop_line": "3 to 8 word lead-in that flows into the hook when the video restarts",\n "cover_text"', 1)
+
+HI_BLOCK = """LANGUAGE: HINGLISH. Write ALL on-screen and caption text (hook_options, sentences, scene labels and rows, cta, loop_line, caption, cover_text, takeaway, first_comment) in natural, friendly Hinglish: Hindi grammar and everyday Hindi words written in the ENGLISH ALPHABET, with common English words kept as they are (AI, prompt, resume, interview, chatbot). Short and conversational, like a helpful senior talking to a college student; address the viewer as "aap". The chat demo prompt and its answer stay in simple English, because that is what people type to an assistant.
+ALSO return "speech": the SAME lines written in DEVANAGARI script for the voice, line by line and word for word parallel to the Hinglish (same meaning, same order), English words spelled phonetically in Devanagari (for example एआई, प्रॉम्प्ट, रिज़्यूमे, इंटरव्यू, चैटबॉट). Shape: {"hook_options": [one per hook option, same order], "sentences": [one per body sentence, same count], "cta": "...", "loop_line": "..."}. No digits in any script (numbers as words). Every rule above (closing style, safety, length) applies to the Hinglish lines."""
+HI_BLOCK_RE = [(re.compile(r"\b(muft|mufat|guarantee[d]?|pakka|kamai|kamayi|lakh|crore|paisa kamao)\b", re.I), "pricing, income or guarantee claim (Hinglish)"),
+               (re.compile(r"मुफ़्त|मुफ्त|फ्री|गारंटी|कमाई|लाख|करोड़|पैसे कमा"), "pricing, income or guarantee claim (Hindi)")]
+DEVANAGARI = re.compile(r"[\u0900-\u097F]")
 
 PASS_TOTAL = 76          # normal bar
 FALLBACK_TOTAL = 70      # last resort, only after every plan failed; accuracy and claim checks still apply
@@ -250,7 +258,16 @@ def finalize(raw: dict, plan: dict | None = None) -> dict:
     cover = clean_text(str(raw.get("cover_text", "")), lex).strip(" .!")
     if not (3 <= len(cover.split()) <= 8):
         cover = " ".join(hook.rstrip(".?!").split()[:7])
+    speech = None
+    if (plan or {}).get("lang") == "hi":
+        sp = raw.get("speech") or {}
+        h_all = list(sp.get("hook_options") or [])
+        speech = {"hook": str(h_all[best[2]]).strip() if best[2] < len(h_all) else "",
+                  "sentences": [str(x).strip() for x in sp.get("sentences") or []],
+                  "cta": str(sp.get("cta") or "").strip(), "loop_line": str(sp.get("loop_line") or "").strip()}
     return {
+        "lang": "hi" if (plan or {}).get("lang") == "hi" else "en",
+        "speech": speech,
         "topic": clean_text(raw.get("topic", ""), lex),
         "category": raw.get("category") if raw.get("category") in topic.CATEGORIES else None,
         "tag": re.sub(r"[^A-Z0-9 +&]", "", str(raw.get("tag", "AI TOOL TIP")).upper())[:24] or "AI TOOL TIP",
@@ -374,6 +391,8 @@ def scene_issues(script: dict, short: bool = False) -> list[str]:
         issues.append(f"scenes use too few different visual types")
     if short and "chat" not in types:
         issues.append("short reel needs an on-screen chat demo scene")
+    elif short and (types[0] != "chat" or int(sc[0].get("from", 1)) != 1):
+        issues.append("results first: the chat demo must be the first scene, starting at sentence 1")
     if any(a == b for a, b in zip(types, types[1:])):
         issues.append("two neighbouring scenes use the same visual type")
     for x in sc:
@@ -382,14 +401,16 @@ def scene_issues(script: dict, short: bool = False) -> list[str]:
 
 
 # ------------------------------------------------------------------------------ plans
-def build_plans(cfg: Config, history: list[dict], today: dt.date, log: dict, fmt: str = "long") -> list[dict]:
-    """Source-grounded plans first (best story with a readable article), evergreen last."""
+def build_plans(cfg: Config, history: list[dict], today: dt.date, log: dict, fmt: str = "long", lang: str = "en") -> list[dict]:
+    """Source-grounded plans first (best story with a readable article), evergreen last.
+    Hinglish reels use evergreen topics only: a translated news story is too easy to get wrong."""
     plans: list[dict] = []
-    try:
-        cands = research.gather()
-    except Exception as e:  # noqa: BLE001
-        print(f"[research] gather failed: {type(e).__name__}", file=sys.stderr)
-        cands = []
+    cands = []
+    if lang != "hi":
+        try:
+            cands = research.gather()
+        except Exception as e:  # noqa: BLE001
+            print(f"[research] gather failed: {type(e).__name__}", file=sys.stderr)
     log["candidates_seen"] = len(cands)
     ranked = topic.choose(cfg, cands, history, today) if cands else []
     log["shortlist"] = [{"title": r["candidate"].title, "publisher": r["candidate"].publisher, "url": r["candidate"].url,
@@ -420,6 +441,8 @@ def writer_prompt(plan: dict, history: list[dict], problems: list[str], today: d
     if st and (st.get("prefer_hooks") or st.get("avoid_hooks")):
         fix += (f"Our own data ({st.get('sample_size')} reels): hook patterns that did best: {st.get('prefer_hooks') or 'unknown'}; "
                 f"weakest: {st.get('avoid_hooks') or 'none'}. Use a best pattern for at least one hook option.\n")
+    if short and plan.get("lang") == "hi":
+        R = R + "\n\n" + HI_BLOCK
     if short:
         fix += engage.prompt_block(plan) + "\n"
         if plan.get("promised"):
@@ -472,7 +495,9 @@ def attempt(cfg: Config, plan: dict, history: list[dict], problems: list[str], t
     issues += scene_issues(script, short)
     if script.get("loop_line"):
         issues += safety.check_text("loop line", script["loop_line"])
-    if script["hook_score"] < HOOK_FLOOR:
+    if plan.get("lang") == "hi":
+        issues += speech_issues(script)
+    elif script["hook_score"] < HOOK_FLOOR:
         issues.append(f"best hook only scores {script['hook_score']} (need {HOOK_FLOOR}+)")
     verified = []
     if source:
@@ -481,7 +506,10 @@ def attempt(cfg: Config, plan: dict, history: list[dict], problems: list[str], t
     if issues:
         return None, issues
     review_input = {"script": {k: script[k] for k in ("hook", "sentences", "cta", "takeaway", "scenes", "opinions")},
-                    "mode": plan["mode"], "format": "short" if short else "long"}
+                    "mode": plan["mode"], "format": "short" if short else "long",
+                    "language": "Hinglish" if plan.get("lang") == "hi" else "English"}
+    if plan.get("lang") == "hi":
+        review_input["speech"] = script.get("speech")
     if source:
         review_input["SOURCE"] = plan["excerpt"]
         review_input["verified_evidence"] = verified
@@ -507,7 +535,53 @@ def attempt(cfg: Config, plan: dict, history: list[dict], problems: list[str], t
     return script, []
 
 
-def finish(script: dict, plan: dict, log: dict) -> dict:
+def speech_issues(script: dict) -> list[str]:
+    """The Devanagari voice lines must mirror the Hinglish display lines, be safe, and have no digits."""
+    sp = script.get("speech") or {}
+    issues = []
+    lines = [sp.get("hook", "")] + list(sp.get("sentences", [])) + [sp.get("cta", "")]
+    if len(sp.get("sentences", [])) != len(script["sentences"]):
+        issues.append(f"speech has {len(sp.get('sentences', []))} sentences, the on-screen text has {len(script['sentences'])}")
+    if any(not DEVANAGARI.search(x) for x in lines):
+        issues.append("every speech line must be written in Devanagari")
+    if script.get("loop_line") and not DEVANAGARI.search(sp.get("loop_line", "")):
+        issues.append("loop line needs a Devanagari speech version")
+    for x in lines + [sp.get("loop_line", "")]:
+        if re.search(r"\d", x) or len(x.split()) > 30:
+            issues.append("speech lines must have no digits and stay under thirty words")
+            break
+    shown = " ".join([script["hook"]] + script["sentences"] + [script["cta"]])
+    for rx, why in HI_BLOCK_RE:
+        m = rx.search(shown + " " + " ".join(lines))
+        if m:
+            issues.append(f"{why}: '{m.group(0)}'")
+    return issues
+
+
+def demo_run(cfg: Config, script: dict) -> bool:
+    """Run the on-screen demo prompt through the real assistant so the result shown is a genuine answer,
+    not text we invented. Keeps the written result if the call fails or the answer looks unusable."""
+    scene = next((x for x in script.get("scenes") or [] if x["visual"].get("type") == "chat"), None)
+    if not scene or not scene["visual"].get("prompt"):
+        return False
+    try:
+        res = llm.chat_json(cfg, "You are a helpful AI assistant. Answer the user's request directly and concretely in plain text, "
+                            'at most 24 words, no markdown, no lists, no preamble. Reply with JSON only: {"answer": "..."}',
+                            scene["visual"]["prompt"], temperature=0.4)
+        ans = re.sub(r"\s+", " ", str(res.get("answer", ""))).strip().replace("\u2014", ",")
+    except Exception as e:  # noqa: BLE001
+        print(f"demo run skipped: {type(e).__name__}", file=sys.stderr)
+        return False
+    if not (4 <= len(ans.split()) <= 28) or re.search(r"https?:|www\.|[*#_`]", ans) or safety.check_text("demo answer", ans):
+        return False
+    scene["visual"]["result"] = ans
+    script["demo_real"] = True
+    return True
+
+
+def finish(script: dict, plan: dict, log: dict, cfg: Config | None = None) -> dict:
+    if cfg is not None and plan.get("fmt") == "short":
+        demo_run(cfg, script)
     script["pillar"] = plan.get("pillar") or plan["category"]
     script["category"] = script.get("category") or plan["category"]
     script["mode"] = plan["mode"]
@@ -558,18 +632,35 @@ def pick_format(cfg: Config, today: dt.date) -> str:
     return "long" if f == "long" else "short"
 
 
-def generate(cfg: Config, history: list[dict], today: dt.date | None = None) -> dict:
+def pick_lang(cfg: Config, today: dt.date, fmt: str) -> str:
+    """Hinglish only for short reels; 'alternate' swaps days, 'auto' follows the growth manager once it is sure."""
+    if fmt != "short":
+        return "en"
+    f = (cfg.reel_lang or "en").lower()
+    if f == "hi":
+        return "hi"
+    if f == "alternate":
+        return "hi" if today.toordinal() % 2 == 0 else "en"
+    if f == "auto":
+        st = load_strategy()
+        w = st.get("lang_winner") if st.get("level") == "reliable" else None
+        return w or ("hi" if today.toordinal() % 2 == 0 else "en")
+    return "en"
+
+
+def generate(cfg: Config, history: list[dict], today: dt.date | None = None, lang: str | None = None) -> dict:
     today = today or dt.date.today()
     log: dict = {"date": today.isoformat()}
     fmt = pick_format(cfg, today)
-    log["format"] = fmt
+    lang = lang or pick_lang(cfg, today, fmt)
+    log["format"], log["lang"] = fmt, lang
     try:
-        plans = build_plans(cfg, history, today, log, fmt)
+        plans = build_plans(cfg, history, today, log, fmt, lang)
     except Exception as e:  # noqa: BLE001 - research or AI outage must not stop the daily post
         print(f"[plans] failed: {type(e).__name__}: {str(e)[:120]}", file=sys.stderr)
         plans = []
     strategy = load_strategy()
-    eng = engage.plan_for(cfg, history, today, fmt, pick_explainer, strategy)
+    eng = engage.plan_for(cfg, history, today, fmt, pick_explainer, strategy, lang)
     log["engagement"] = {k: eng[k] for k in ("cta_style", "teaser", "promised")}
     promised = eng.get("promised") and engage.entry_by_title(eng["promised"])
     if promised:                                 # yesterday's teaser: keep the promise first
@@ -578,6 +669,7 @@ def generate(cfg: Config, history: list[dict], today: dt.date | None = None) -> 
     for plan in plans:
         plan.setdefault("fmt", fmt)
         plan.update({k: v for k, v in eng.items() if k in ("cta_style", "teaser", "promised")})
+        plan["lang"] = lang
         if plan["mode"] == "source":
             plan["promised"] = None
         tries = 3
@@ -587,13 +679,19 @@ def generate(cfg: Config, history: list[dict], today: dt.date | None = None) -> 
             print(f"[{plan['mode']}] attempt {n + 1}: {label[:80]}", file=sys.stderr)
             script, issues = attempt(cfg, plan, history, problems, today)
             if script:
-                return finish(script, plan, log)
+                return finish(script, plan, log, cfg)
             problems += issues
             print(f"  rejected: {issues[:4]}", file=sys.stderr)
     if _NEAR:
         total, script, plan = max(_NEAR, key=lambda t: t[0])
         print(f"using best near-miss script ({total}/100): every safety and accuracy check passed", file=sys.stderr)
-        return finish(script, plan, log)
+        return finish(script, plan, log, cfg)
+    if lang == "hi" and cfg.hi_strict:
+        raise RuntimeError("no Hinglish script passed the checks (strict test run: not falling back to English)")
+    if lang == "hi":
+        print("no Hinglish script passed; making today's reel in English instead", file=sys.stderr)
+        _NEAR.clear()
+        return generate(cfg, history, today, lang="en")
     print("no live script passed; using a pre-checked backup lesson", file=sys.stderr)
     return backup_script(history, today, fmt)
 

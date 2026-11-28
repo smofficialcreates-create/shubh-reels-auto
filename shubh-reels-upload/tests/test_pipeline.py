@@ -261,11 +261,11 @@ SHORT = {
         "It will list a few sharper questions and why each one matters.",
         "Pick the best one and ask that, and the answer gets specific."],
     "scenes": [
-        {"from": 1, "to": 3, "label": "the problem", "visual": {"type": "compare",
+        {"from": 1, "to": 2, "label": "the demo", "visual": {"type": "chat", "prompt": "What question should I really be asking about my career switch?",
+            "result": "Ask which skills transfer, which gaps matter most, and who hires for both."}},
+        {"from": 3, "to": 5, "label": "weak vs better", "visual": {"type": "compare",
             "left": {"title": "weak way", "rows": ["first thought", "vague answer"]},
             "right": {"title": "better way", "rows": ["sharper question", "specific answer"]}}},
-        {"from": 4, "to": 5, "label": "the demo", "visual": {"type": "chat", "prompt": "What question should I really be asking about my career switch?",
-            "result": "Ask which skills transfer, which gaps matter most, and who hires for both."}},
         {"from": 6, "to": 6, "label": "the rule", "visual": {"type": "keyword", "word": "specific"}}],
     "takeaway": "Ask for the better question first.", "emphasis": ["question", "guess", "guess", "ask", "sharper", "specific", "tomorrow"],
     "evidence": [], "opinions": [], "cta_type": "question",
@@ -288,8 +288,8 @@ class ShortMode(unittest.TestCase):
         self.assertTrue(script["first_comment"].endswith("below."))
 
     def test_short_needs_chat_demo_and_closing_question(self):
-        no_chat = dict(SHORT, scenes=[s for s in SHORT["scenes"] if s["visual"]["type"] != "chat"] + [
-            {"from": 4, "to": 5, "label": "x", "visual": {"type": "definition", "term": "Sharper", "meaning": "a question with a clear goal"}}])
+        no_chat = dict(SHORT, scenes=[
+            {"from": 1, "to": 2, "label": "x", "visual": {"type": "definition", "term": "Sharper", "meaning": "a question with a clear goal"}}] + SHORT["scenes"][1:])
         _s, issues = run_attempt(no_chat, SHORT_REVIEW, short_plan())
         self.assertTrue(any("chat" in i for i in issues))
         _s, issues = run_attempt(dict(SHORT, cta="Save this for later."), SHORT_REVIEW, short_plan())
@@ -576,3 +576,131 @@ class Engagement(unittest.TestCase):
             r["score"] = 40.0 if r["cta_style"] == "keyword" else 5.0
         st = growth.analyze(rows)
         self.assertEqual(st["prefer_cta"][0], "keyword")
+
+
+class ResultsFirst(unittest.TestCase):
+    def test_chat_demo_must_open_the_reel(self):
+        late = dict(SHORT, scenes=[SHORT["scenes"][1], SHORT["scenes"][0], SHORT["scenes"][2]])
+        late["scenes"] = [dict(late["scenes"][0], **{"from": 1, "to": 2}), dict(late["scenes"][1], **{"from": 3, "to": 5}), late["scenes"][2]]
+        _s, issues = run_attempt(late, SHORT_REVIEW, short_plan())
+        self.assertTrue(any("results first" in i or "chat" in i for i in issues))
+
+    def test_demo_is_run_through_the_real_assistant(self):
+        script, _ = run_attempt(SHORT, SHORT_REVIEW, short_plan())
+        with mock.patch("reelbot.script_gen.llm.chat_json", return_value={"answer": "Ask which skills transfer, which gaps matter, and which employers hire for both."}):
+            self.assertTrue(script_gen.demo_run(Config(), script))
+        self.assertTrue(script["demo_real"])
+        self.assertTrue(script["scenes"][0]["visual"]["result"].startswith("Ask which skills transfer, which gaps matter"))
+
+    def test_bad_or_failed_demo_keeps_the_written_result(self):
+        script, _ = run_attempt(SHORT, SHORT_REVIEW, short_plan())
+        before = script["scenes"][0]["visual"]["result"]
+        for bad in ({"answer": "See https://example.com now please thanks"}, {"answer": "ok"}, {"answer": "**bold** markdown answer with enough words here"}):
+            with mock.patch("reelbot.script_gen.llm.chat_json", return_value=bad):
+                self.assertFalse(script_gen.demo_run(Config(), script))
+        with mock.patch("reelbot.script_gen.llm.chat_json", side_effect=RuntimeError("down")):
+            self.assertFalse(script_gen.demo_run(Config(), script))
+        self.assertEqual(script["scenes"][0]["visual"]["result"], before)
+        self.assertNotIn("demo_real", script)
+
+
+HI = dict(SHORT,
+          hook_options=["Aap AI se galat sawaal pooch rahe ho.", "Aapka pehla prompt kaafi nahi hota.", "AI ke jawaab vague kyun aate hain?"],
+          sentences=["Zyada log pehla sawaal hi AI se pooch lete hain.", "Wo sawaal aksar andaaza hota hai.", "Isliye AI bhi andaaza hi lautaata hai.",
+                     "Ab ye try karo: AI se pucho ki aapko kaun sa sawaal puchna chahiye.", "Wo kuch behtar sawaal dega aur har sawaal ki wajah bhi batayega.",
+                     "Sabse accha wala pucho aur jawaab specific ho jaayega."],
+          cta="Kal AI se sabse pehle aap kya poochoge?", first_comment="Aap kaun sa sawaal sharp karoge? Neeche batao.",
+          caption="Aap AI se galat sawaal pooch rahe ho.\nBehtar sawaal pucho.\nai prompts, productivity\nAI-generated video.",
+          speech={"hook_options": ["आप एआई से गलत सवाल पूछ रहे हो।", "आपका पहला प्रॉम्प्ट काफ़ी नहीं होता।", "एआई के जवाब वेग क्यों आते हैं?"],
+                  "sentences": ["ज़्यादा लोग पहला सवाल ही एआई से पूछ लेते हैं।", "वो सवाल अक्सर अंदाज़ा होता है।", "इसलिए एआई भी अंदाज़ा ही लौटाता है।",
+                                "अब ये ट्राई करो: एआई से पूछो कि आपको कौन सा सवाल पूछना चाहिए।", "वो कुछ बेहतर सवाल देगा और वजह भी बताएगा।",
+                                "सबसे अच्छा वाला पूछो और जवाब स्पेसिफ़िक हो जाएगा।"],
+                  "cta": "कल एआई से सबसे पहले आप क्या पूछोगे?", "loop_line": ""})
+
+
+def hi_plan():
+    return dict(short_plan(), lang="hi")
+
+
+class Hinglish(unittest.TestCase):
+    def test_hinglish_script_passes_and_keeps_two_scripts(self):
+        script, issues = run_attempt(HI, SHORT_REVIEW, hi_plan())
+        self.assertEqual(issues, [])
+        self.assertEqual(script["lang"], "hi")
+        self.assertEqual(script["speech"]["hook"], HI["speech"]["hook_options"][0] if script["hook"] == HI["hook_options"][0] else script["speech"]["hook"])
+        from reelbot import brand
+        shown, said = brand.spoken(script), brand.speech(script)
+        self.assertEqual(len(shown), len(said))
+        self.assertEqual(shown[-1], brand.OUTRO_SHORT_HI)
+        self.assertTrue(all(any("ऀ" <= ch <= "ॿ" for ch in line) for line in said))
+
+    def test_speech_must_mirror_and_be_safe(self):
+        short_speech = dict(HI, speech=dict(HI["speech"], sentences=HI["speech"]["sentences"][:-1]))
+        _s, issues = run_attempt(short_speech, SHORT_REVIEW, hi_plan())
+        self.assertTrue(any("speech has" in i for i in issues))
+        latin = dict(HI, speech=dict(HI["speech"], cta="Kal AI se pehle kya poochoge?"))
+        _s, issues = run_attempt(latin, SHORT_REVIEW, hi_plan())
+        self.assertTrue(any("Devanagari" in i for i in issues))
+        digits = dict(HI, speech=dict(HI["speech"], cta="कल 5 सवाल पूछोगे?"))
+        _s, issues = run_attempt(digits, SHORT_REVIEW, hi_plan())
+        self.assertTrue(any("digits" in i for i in issues))
+        claim = dict(HI, sentences=HI["sentences"][:-1] + ["Ye tarika muft aur guaranteed hai."])
+        _s, issues = run_attempt(claim, SHORT_REVIEW, hi_plan())
+        self.assertTrue(any("claim" in i for i in issues))
+
+    def test_voice_reads_devanagari_but_words_are_timed_on_the_hinglish_lines(self):
+        from reelbot import brand, main, tts
+        script, _ = run_attempt(HI, SHORT_REVIEW, hi_plan())
+        nar = main.make_voice(Config(), script, fake=True)
+        self.assertEqual(len(nar.sentence_times), len(brand.spoken(script)))
+        secs = planner.build_sections(script, nar)
+        self.assertEqual(secs[0].kind, "hook")
+        self.assertEqual(secs[-1].kind, "cta")
+
+    def test_language_selection(self):
+        d0, d1 = dt.date(2026, 12, 2), dt.date(2026, 12, 3)
+        self.assertEqual(script_gen.pick_lang(Config(reel_lang="en"), d0, "short"), "en")
+        self.assertEqual(script_gen.pick_lang(Config(reel_lang="hi"), d0, "short"), "hi")
+        self.assertEqual(script_gen.pick_lang(Config(reel_lang="hi"), d0, "long"), "en")
+        self.assertEqual({script_gen.pick_lang(Config(reel_lang="alternate"), d, "short") for d in (d0, d1)}, {"en", "hi"})
+
+    def test_hinglish_reels_have_no_keyword_or_teaser(self):
+        from reelbot import engage
+        cfg = Config(); cfg.ig_token = "t"
+        eng = engage.plan_for(cfg, [{}] * 8, dt.date(2026, 12, 2), "short", lambda h, d: {"title": "A topic"}, None, "hi")
+        self.assertNotEqual(eng["cta_style"], "keyword")
+        self.assertIsNone(eng["teaser"])
+        from reelbot import engage as e
+        self.assertEqual(e.check_cta("choice", "Kaun sa pehle try karoge, weak ya sharp prompt?", {}), [])
+        self.assertEqual(e.check_cta("rate", "Ise ek se paanch mein rate karo.", {}), [])
+
+    def test_hindi_failure_falls_back_to_english_unless_strict(self):
+        bad = dict(HI, speech=dict(HI["speech"], sentences=[]))
+
+        def fake(cfg, system, user, temperature=0.0):
+            if system == script_gen.REVIEW_SYSTEM:
+                return SHORT_REVIEW
+            return bad if "HINGLISH" in system else SHORT
+        script_gen._NEAR.clear()
+        with mock.patch("reelbot.script_gen.build_plans", return_value=[explainer_plan()]), \
+             mock.patch("reelbot.llm.chat_json", side_effect=fake), mock.patch("reelbot.script_gen.demo_run", return_value=False), \
+             mock.patch("reelbot.script_gen.engage.plan_for", return_value={"cta_style": "question", "teaser": None, "promised": None}):
+            out = script_gen.generate(Config(reel_lang="hi"), [], dt.date(2026, 12, 2))
+        self.assertEqual(out.get("lang"), "en")
+        self.assertEqual(out["mode"], "explainer")
+        script_gen._NEAR.clear()
+        cfg = Config(reel_lang="hi")
+        cfg.hi_strict = True
+        with mock.patch("reelbot.script_gen.build_plans", return_value=[explainer_plan()]), \
+             mock.patch("reelbot.llm.chat_json", side_effect=fake):
+            with self.assertRaises(RuntimeError):
+                script_gen.generate(cfg, [], dt.date(2026, 12, 2))
+
+    def test_growth_picks_a_language_winner(self):
+        from reelbot import growth
+        rows = Growth().rows(24)
+        for i, r in enumerate(rows):
+            r["lang"] = "hi" if i % 2 else "en"
+            r["reach"] = 400 if r["lang"] == "hi" else 100
+        st = growth.analyze(rows)
+        self.assertEqual(st["lang_winner"], "hi")

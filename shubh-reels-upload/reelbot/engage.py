@@ -43,13 +43,13 @@ def check_cta(style: str | None, cta: str, script: dict) -> list[str]:
     issues = []
     if style in ("question", "choice", "next") and not cta.rstrip().endswith("?"):
         issues.append(f"closing line must be a question ({style})")
-    if style == "choice" and " or " not in low:
+    if style == "choice" and " or " not in f" {low} " and " ya " not in f" {low} ":
         issues.append("an either-or closing question needs the word 'or'")
-    if style == "blank" and "blank" not in low:
+    if style == "blank" and "blank" not in low and "khali" not in low:
         issues.append("a fill-in closing line must say the word blank")
-    if style == "rate" and "one to five" not in low:
+    if style == "rate" and not re.search(r"one to five|ek se p[a]+n?ch", low):
         issues.append("a rating closing line must say 'from one to five'")
-    if style == "share" and "send" not in low:
+    if style == "share" and not re.search(r"\b(send|bhej|share)", low):
         issues.append("a share closing line must tell the viewer to send the reel to a friend")
     if style == "keyword":
         kw = (script.get("keyword") or "").upper()
@@ -121,9 +121,10 @@ def pending_promise(history: list[dict]) -> str | None:
     return (history[-1].get("promise") or None) if history else None
 
 
-def plan_for(cfg, history: list[dict], today: dt.date, fmt: str, picker, strategy: dict | None = None) -> dict:
-    keyword_ok = getattr(cfg, "keyword_dm", "on") != "off" and fmt == "short" and bool(getattr(cfg, "ig_token", ""))
+def plan_for(cfg, history: list[dict], today: dt.date, fmt: str, picker, strategy: dict | None = None, lang: str = "en") -> dict:
+    hi = lang == "hi"          # Hinglish reels: no keyword reward and no teaser (both need English text)
+    keyword_ok = getattr(cfg, "keyword_dm", "on") != "off" and fmt == "short" and bool(getattr(cfg, "ig_token", "")) and not hi
     style = pick_style(history, today, keyword_ok, strategy) if fmt == "short" else "question"
     promised = pending_promise(history)
-    teaser = pick_teaser(history, today, picker, style == "keyword") if fmt == "short" and not promised else None
+    teaser = pick_teaser(history, today, picker, style == "keyword") if fmt == "short" and not promised and not hi else None
     return {"cta_style": style, "teaser": teaser, "promised": promised}

@@ -205,8 +205,12 @@ def synth_bundle(texts: list[str], voice: str, speed: float, model_dir: str) -> 
     return assemble([k.create(t, voice, speed) for t in texts], SR, texts)
 
 
-def synth_voice(texts: list[str], voice: str, speed: float, model_dir: str) -> Narration:
-    """Preferred: kokoro-onnx (espeak phonemes). Fallback: the verified bundle path."""
+def synth_voice(texts: list[str], voice: str, speed: float, model_dir: str, speech: list[str] | None = None) -> Narration:
+    """Preferred: kokoro-onnx (espeak phonemes). Fallback: the verified bundle path (English only).
+    With `speech` (Devanagari lines parallel to `texts`) the voice reads Hindi and `texts` only times the on-screen words;
+    there is no fallback for Hindi, so a failure raises and the caller posts an English reel instead."""
+    if speech is not None:
+        return synth_kokoro(texts, voice, speed, model_dir, speech=speech, lang="hi")
     try:
         return synth_kokoro(texts, voice, speed, model_dir)
     except Exception as e:  # noqa: BLE001 - any failure here falls back, loudly
@@ -214,13 +218,17 @@ def synth_voice(texts: list[str], voice: str, speed: float, model_dir: str) -> N
         return synth_bundle(texts, voice, speed, model_dir)
 
 
-def synth_kokoro(texts: list[str], voice: str, speed: float, model_dir: str) -> Narration:
+def synth_kokoro(texts: list[str], voice: str, speed: float, model_dir: str, speech: list[str] | None = None,
+                 lang: str = "en-us") -> Narration:
     from kokoro_onnx import Kokoro  # imported lazily: heavy and only needed here
     model, voices = download_models(model_dir)
     k = Kokoro(model, voices)
+    if speech is not None and len(speech) != len(texts):
+        raise ValueError("speech lines and on-screen lines do not match")
     chunks = []
-    for t in texts:
-        samples, sr = k.create(__import__("reelbot.brand", fromlist=["say"]).say(t), voice=voice, speed=speed, lang="en-us")
+    for i, t in enumerate(texts):
+        line = speech[i] if speech is not None else __import__("reelbot.brand", fromlist=["say"]).say(t)
+        samples, sr = k.create(line, voice=voice, speed=speed, lang=lang)
         if sr != SR:
             raise RuntimeError(f"unexpected sample rate {sr}")
         chunks.append(np.asarray(samples, np.float32))
@@ -248,6 +256,6 @@ def _fake_sentence(text: str, rng: np.random.Generator) -> np.ndarray:
     return np.concatenate(out) if out else np.zeros(SR // 4, np.float32)
 
 
-def synth_fake(texts: list[str], seed: int = 5) -> Narration:
+def synth_fake(texts: list[str], seed: int = 5, speech: list[str] | None = None) -> Narration:
     rng = np.random.default_rng(seed)
     return assemble([_fake_sentence(t, rng) for t in texts], SR, texts)

@@ -44,7 +44,7 @@ def join(history: list[dict], data: dict) -> list[dict]:
         reach = k.get("reach") or 0
         inter = (k.get("shares") or 0) * 3 + (k.get("saved") or 0) * 2 + (k.get("comments") or 0) * 2 + (k.get("likes") or 0)
         rows.append({"media_id": h["media_id"], "topic": h.get("topic"), "category": h.get("category"),
-                     "hook": h.get("hook"), "cta_style": h.get("cta_style"), "hook_mechanism": (h.get("hook_mechanism") or "").lower() or None,
+                     "hook": h.get("hook"), "cta_style": h.get("cta_style"), "lang": h.get("lang") or "en", "hook_mechanism": (h.get("hook_mechanism") or "").lower() or None,
                      "format": h.get("format") or "long", "series": h.get("series"),
                      "bucket": hour_bucket(h.get("posted_at") or m.get("timestamp")), "reach": reach,
                      "views": k.get("views") or 0, "watch_s": (k.get("ig_reels_avg_watch_time") or 0) / 1000.0,
@@ -87,7 +87,7 @@ def best_worst(groups: dict, min_best: int = 2, min_worst: int = 3):
 def analyze(rows: list[dict]) -> dict:
     n = len(rows)
     lv = level(n)
-    cat, hook, fmt, ser, buck, cta = (group(rows, k) for k in ("category", "hook_mechanism", "format", "series", "bucket", "cta_style"))
+    cat, hook, fmt, ser, buck, cta, lng = (group(rows, k) for k in ("category", "hook_mechanism", "format", "series", "bucket", "cta_style", "lang"))
     pc, ac = best_worst(cat)
     ph, ah = best_worst(hook)
     pcta, acta = best_worst(cta)
@@ -96,6 +96,11 @@ def analyze(rows: list[dict]) -> dict:
         (a, ga), (b, gb) = sorted(fmt.items(), key=lambda kv: -value(kv[1]))
         if value(ga) >= 1.3 * value(gb):
             winner = a
+    lang_winner = None
+    if lv == "reliable" and len(lng) == 2 and all(g["n"] >= 4 for g in lng.values()):
+        (a, ga), (b, gb) = sorted(lng.items(), key=lambda kv: -value(kv[1]))
+        if value(ga) >= 1.3 * value(gb):
+            lang_winner = a
     pb, _ = best_worst(buck, 3, 99)
     notes = []
     if lv == "collecting":
@@ -106,8 +111,8 @@ def analyze(rows: list[dict]) -> dict:
             "prefer_categories": pc if lv != "collecting" else [], "avoid_categories": ac if lv != "collecting" else [],
             "prefer_hooks": ph if lv != "collecting" else [], "avoid_hooks": ah if lv != "collecting" else [],
             "prefer_cta": pcta if lv != "collecting" else [], "avoid_cta": acta if lv != "collecting" else [],
-            "format_winner": winner, "best_time": pb[0] if pb and lv != "collecting" else None,
-            "groups": {"category": cat, "hook": hook, "format": fmt, "series": ser, "time": buck, "cta": cta}, "notes": notes}
+            "format_winner": winner, "lang_winner": lang_winner, "best_time": pb[0] if pb and lv != "collecting" else None,
+            "groups": {"category": cat, "hook": hook, "format": fmt, "series": ser, "time": buck, "cta": cta, "lang": lng}, "notes": notes}
 
 
 def draft_replies(cfg: Config, comments: list[dict]) -> list[dict]:
@@ -164,13 +169,13 @@ def report(strategy: dict, rows: list[dict], account: dict, replies: list[dict],
     worst = sorted(rows, key=lambda r: r["score"])[:3]
     out += ["", "## Best three reels (engagement per 1000 reach)"] + [f"- {r['score']} | reach {r['reach']} | {r['topic']} | {r['hook']}" for r in best]
     out += ["", "## Weakest three"] + [f"- {r['score']} | reach {r['reach']} | {r['topic']} | {r['hook']}" for r in worst]
-    for title, key in (("Category", "category"), ("Hook pattern", "hook"), ("Closing style", "cta"), ("Format", "format"), ("Series", "series"), ("Time of day (IST)", "time")):
+    for title, key in (("Category", "category"), ("Hook pattern", "hook"), ("Closing style", "cta"), ("Language", "lang"), ("Format", "format"), ("Series", "series"), ("Time of day (IST)", "time")):
         out += ["", f"## {title}", table(strategy["groups"][key])]
     out += ["## What the writer will do next week",
             f"- prefer categories: {strategy['prefer_categories'] or 'no change'}", f"- avoid categories: {strategy['avoid_categories'] or 'none'}",
             f"- prefer hook patterns: {strategy['prefer_hooks'] or 'no change'}", f"- avoid hook patterns: {strategy['avoid_hooks'] or 'none'}",
             f"- prefer closing styles: {strategy['prefer_cta'] or 'no change'}",
-            f"- format winner: {strategy['format_winner'] or 'none yet'}", f"- best time bucket: {strategy['best_time'] or 'not enough data'}"]
+            f"- format winner: {strategy['format_winner'] or 'none yet'}", f"- language winner: {strategy['lang_winner'] or 'none yet'}", f"- best time bucket: {strategy['best_time'] or 'not enough data'}"]
     if replies:
         out += ["", "## Draft replies (copy, edit and post them yourself)"]
         for r in replies:

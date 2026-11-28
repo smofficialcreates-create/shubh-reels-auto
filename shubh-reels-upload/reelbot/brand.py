@@ -6,7 +6,26 @@ OUTRO = "Follow for more smart ways to work."
 OUTRO_SHORT = "I'm Shubh. Follow for more."   # short reels: name goes last, payoff comes first
 
 
+OUTRO_SHORT_HI = "Main Shubh hoon. Aur ke liye follow karo."
+OUTRO_HI_SPEECH = "मैं शुभ हूँ। और वीडियो के लिए फ़ॉलो करो।"
+
+
+def is_hi(script: dict) -> bool:
+    return script.get("lang") == "hi"
+
+
+def speech(script: dict) -> list[str]:
+    """Lines for the voice, parallel to spoken(): Devanagari for Hindi reels (the on-screen text stays Hinglish)."""
+    sp = script.get("speech") or {}
+    lines = [sp["hook"]] + list(sp["sentences"]) + [sp["cta"], OUTRO_HI_SPEECH]
+    if has_loop(script) and sp.get("loop_line"):
+        lines.append(sp["loop_line"])
+    return lines
+
+
 def outro_short(script: dict) -> str:
+    if is_hi(script):
+        return OUTRO_SHORT_HI
     t = script.get("teaser")
     return f"I'm Shubh. Tomorrow: {t}. Follow so you don't miss it." if t else OUTRO_SHORT
 

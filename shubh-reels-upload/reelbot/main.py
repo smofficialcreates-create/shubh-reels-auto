@@ -25,10 +25,21 @@ def load_history(path="data/history.json") -> list[dict]:
         return []
 
 
+def make_voice(cfg: Config, script: dict, fake: bool = False):
+    """Narration for a script. Hindi reels read the Devanagari lines with a Hindi voice."""
+    texts = brand.spoken(script)
+    if brand.is_hi(script):
+        speech = brand.speech(script)
+        if fake:
+            return tts.synth_fake(texts, speech=speech)
+        return tts.synth_voice(texts, cfg.voice_hi, cfg.speed_hi, cfg.model_dir, speech=speech)
+    return tts.synth_fake(texts) if fake else tts.synth_voice(texts, cfg.voice, cfg.speed, cfg.model_dir)
+
+
 def save_script(script: dict, media_id: str, folder: str = "data/scripts") -> None:
     """Keep what the weekly carousel and the growth report need (small, no research logs)."""
     keep = ("topic", "category", "series", "episode", "format", "hook", "hook_focus", "hook_mechanism", "sentences", "scenes",
-            "cta", "takeaway", "caption", "first_comment", "cover_text", "emphasis", "cta_style", "keyword", "reward_text", "teaser")
+            "cta", "takeaway", "caption", "first_comment", "cover_text", "emphasis", "cta_style", "keyword", "reward_text", "teaser", "lang", "speech")
     os.makedirs(folder, exist_ok=True)
     rec = {k: script.get(k) for k in keep}
     rec["media_id"] = media_id
@@ -56,8 +67,16 @@ def main(argv=None) -> int:
     json.dump(script, open(os.path.join(args.out_dir, "script.json"), "w"), indent=2)
     print(f"topic: {script['topic']}  (hook score {script.get('hook_score', 'n/a')})")
 
-    texts = brand.spoken(script)
-    nar = tts.synth_fake(texts) if args.fake_tts else tts.synth_voice(texts, cfg.voice, cfg.speed, cfg.model_dir)
+    try:
+        nar = make_voice(cfg, script, args.fake_tts)
+    except Exception as e:  # noqa: BLE001
+        if not brand.is_hi(script) or cfg.hi_strict:
+            raise
+        print(f"Hindi voice failed ({type(e).__name__}: {str(e)[:160]}); making today's reel in English instead")
+        script = script_gen.generate(cfg, history, lang="en")
+        series.assign(script, history)
+        json.dump(script, open(os.path.join(args.out_dir, "script.json"), "w"), indent=2)
+        nar = make_voice(cfg, script, args.fake_tts)
     total = len(nar.audio) / nar.sr
     print(f"voice: {total:.1f}s")
     limit = 55 if script.get("format") == "short" else 85
@@ -66,8 +85,7 @@ def main(argv=None) -> int:
         script = script_gen.backup_script(history, dt.date.today(), script.get("format") or "long")
         series.assign(script, history)
         json.dump(script, open(os.path.join(args.out_dir, "script.json"), "w"), indent=2)
-        texts = brand.spoken(script)
-        nar = tts.synth_fake(texts) if args.fake_tts else tts.synth_voice(texts, cfg.voice, cfg.speed, cfg.model_dir)
+        nar = make_voice(cfg, script, args.fake_tts)
         total = len(nar.audio) / nar.sr
         print(f"voice: {total:.1f}s")
     if total > 88:
@@ -101,7 +119,7 @@ def main(argv=None) -> int:
         publish.post_comment(cfg, result["id"], script["first_comment"])
     history.append({"date": dt.date.today().isoformat(), "topic": script["topic"], "category": script.get("category"),
                     "hook": script["hook"], "format": script.get("format"), "hook_mechanism": script.get("hook_mechanism"),
-                    "cta_type": script.get("cta_type"), "cta_style": script.get("cta_style") or "question",
+                    "lang": script.get("lang") or "en", "cta_type": script.get("cta_type"), "cta_style": script.get("cta_style") or "question",
                     "keyword": script.get("keyword") or None, "promise": script.get("teaser") or None, "words": len(" ".join(brand.spoken(script)).split()),
                     "source_url": (script.get("source") or {}).get("url"),
                     "mode": script.get("mode"), "quality": (script.get("quality") or {}).get("total"),

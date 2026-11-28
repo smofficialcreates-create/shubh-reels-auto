@@ -24,6 +24,10 @@ class Config:
     graph_version: str = field(default_factory=lambda: _env("IG_GRAPH_VERSION", "v23.0"))
     post_at: str = field(default_factory=lambda: _env("POST_AT_IST"))      # e.g. 19:30, India time
     reel_format: str = field(default_factory=lambda: _env("REEL_FORMAT", "short"))   # short | long | alternate
+    reel_lang: str = field(default_factory=lambda: _env("REEL_LANG", "en"))   # en | hi | alternate | auto
+    voice_hi: str = field(default_factory=lambda: _env("KOKORO_VOICE_HI", "hm_omega"))
+    speed_hi: float = field(default_factory=lambda: float(_env("KOKORO_SPEED_HI", "1.0")))
+    hi_strict: bool = field(default_factory=lambda: bool(_env("HI_STRICT", "")))   # test runs: fail loudly instead of falling back to English
     keyword_dm: str = field(default_factory=lambda: _env("KEYWORD_DM", "on"))   # on | off: comment-keyword rewards
     repo: str = field(default_factory=lambda: _env("GITHUB_REPOSITORY"))
     gh_token: str = field(default_factory=lambda: _env("GITHUB_TOKEN"))
